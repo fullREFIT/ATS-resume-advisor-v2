@@ -8,32 +8,70 @@ import { InfoBlock } from "@/components/ui/InfoBlock";
 import { InterviewPrep } from "@/components/InterviewPrep";
 import { TailoredExperience } from "@/components/TailoredBullets";
 import { clearSession, loadSession } from "@/lib/storage";
-import type { SessionState, TailoredOutput } from "@/lib/types";
+import type {
+  CompanyTailoredOutput,
+  IntakeMode,
+  SessionState,
+  TailoredOutput,
+} from "@/lib/types";
 
 export function ResultPageClient() {
   const router = useRouter();
+  const [mode, setMode] = useState<IntakeMode>("role");
   const [tailored, setTailored] = useState<TailoredOutput | null>(null);
+  const [companyTailored, setCompanyTailored] =
+    useState<CompanyTailoredOutput | null>(null);
   const [session, setSession] = useState<SessionState | null>(null);
 
   useEffect(() => {
     const s = loadSession();
-    if (!s.tailored) {
-      router.replace("/");
-      return;
+    if (s.mode === "company") {
+      if (!s.companyTailored) {
+        router.replace("/");
+        return;
+      }
+      setMode("company");
+      setCompanyTailored(s.companyTailored);
+    } else {
+      if (!s.tailored) {
+        router.replace("/");
+        return;
+      }
+      setMode("role");
+      setTailored(s.tailored);
     }
-    setTailored(s.tailored);
     setSession(s);
   }, [router]);
-
-  if (!tailored || !session) {
-    return <p className="text-sm text-echo">Loading your result…</p>;
-  }
 
   function onStartOver() {
     clearSession();
     router.push("/");
   }
 
+  if (!session) {
+    return <p className="text-sm text-echo">Loading your result…</p>;
+  }
+  if (mode === "company" && companyTailored) {
+    return (
+      <CompanyResultView
+        tailored={companyTailored}
+        onStartOver={onStartOver}
+      />
+    );
+  }
+  if (mode === "role" && tailored) {
+    return <RoleResultView tailored={tailored} onStartOver={onStartOver} />;
+  }
+  return <p className="text-sm text-echo">Loading your result…</p>;
+}
+
+function RoleResultView({
+  tailored,
+  onStartOver,
+}: {
+  tailored: TailoredOutput;
+  onStartOver: () => void;
+}) {
   const contactLine = [
     tailored.contact.location,
     tailored.contact.phone,
@@ -61,9 +99,7 @@ export function ResultPageClient() {
         <p className="text-base font-semibold text-carbon-core">
           {tailored.contact.name}
         </p>
-        {contactLine && (
-          <p className="text-sm text-echo">{contactLine}</p>
-        )}
+        {contactLine && <p className="text-sm text-echo">{contactLine}</p>}
       </section>
 
       <section className="card-surface flex flex-col gap-3">
@@ -144,11 +180,7 @@ export function ResultPageClient() {
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <DownloadDocxButton tailored={tailored} />
-        <Button
-          variant="secondary"
-          onClick={onStartOver}
-          className="sm:w-auto"
-        >
+        <Button variant="secondary" onClick={onStartOver} className="sm:w-auto">
           Start over with a new resume
         </Button>
       </div>
@@ -156,7 +188,122 @@ export function ResultPageClient() {
   );
 }
 
-function DownloadDocxButton({ tailored }: { tailored: TailoredOutput }) {
+function CompanyResultView({
+  tailored,
+  onStartOver,
+}: {
+  tailored: CompanyTailoredOutput;
+  onStartOver: () => void;
+}) {
+  const contactLine = [
+    tailored.contact.location,
+    tailored.contact.phone,
+    tailored.contact.email,
+    tailored.contact.linkedin,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  return (
+    <>
+      <div className="card-layer-1 flex flex-col gap-2">
+        <p className="section-label">Step 4 — Result</p>
+        <h1 className="text-2xl font-semibold tracking-tight text-carbon-core sm:text-3xl">
+          Your cold-outreach kit.
+        </h1>
+        <p className="text-base text-carbon-core">
+          A tailored resume, a positioning angle, and a draft message you can
+          send. All grounded in their site and your inputs.
+        </p>
+      </div>
+
+      <section className="card-surface border-t-[3px] border-t-forge-red">
+        <p className="section-label mb-2">Positioning angle</p>
+        <p className="text-base leading-relaxed text-carbon-core">
+          {tailored.coldOutreachAngle.positioning}
+        </p>
+      </section>
+
+      <section className="card-surface">
+        <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
+          <p className="section-label">Draft message</p>
+          <CopyButton text={tailored.coldOutreachAngle.draftMessage} />
+        </div>
+        <pre className="whitespace-pre-wrap font-sans text-base leading-relaxed text-carbon-core">
+          {tailored.coldOutreachAngle.draftMessage}
+        </pre>
+        <p className="mt-3 text-xs text-echo">
+          Read it once before sending. Anything that doesn&apos;t sound like
+          you, edit. You&apos;re signing it.
+        </p>
+      </section>
+
+      {tailored.companyHooksUsed?.length > 0 && (
+        <section className="card-surface">
+          <p className="section-label mb-2">What the message references</p>
+          <ul className="ml-5 list-disc text-sm leading-relaxed text-carbon-core">
+            {tailored.companyHooksUsed.map((h, i) => (
+              <li key={i}>{h}</li>
+            ))}
+          </ul>
+          <p className="mt-2 text-xs text-echo">
+            Every claim above is from their site. Nothing invented.
+          </p>
+        </section>
+      )}
+
+      <section className="card-surface flex flex-col gap-1">
+        <p className="section-label mb-1">Contact</p>
+        <p className="text-base font-semibold text-carbon-core">
+          {tailored.contact.name}
+        </p>
+        {contactLine && <p className="text-sm text-echo">{contactLine}</p>}
+      </section>
+
+      <section className="card-surface flex flex-col gap-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <p className="section-label">Professional summary</p>
+          <CopyButton text={tailored.summary} />
+        </div>
+        <p className="text-base leading-relaxed text-carbon-core">
+          {tailored.summary}
+        </p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <p className="section-label">Tailored experience</p>
+        <TailoredExperience experience={tailored.experience} />
+      </section>
+
+      {tailored.skills?.length > 0 && (
+        <section className="card-surface">
+          <p className="section-label mb-2">Skills</p>
+          <p className="text-sm leading-relaxed text-carbon-core">
+            {tailored.skills.join(" · ")}
+          </p>
+        </section>
+      )}
+
+      <section className="flex flex-col gap-3">
+        <p className="section-label">If they reply, prep for these</p>
+        <InterviewPrep prep={tailored.interviewPrep} />
+      </section>
+
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <DownloadDocxButton tailored={tailored} />
+        <Button variant="secondary" onClick={onStartOver} className="sm:w-auto">
+          Start over
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function DownloadDocxButton({
+  tailored,
+}: {
+  tailored: TailoredOutput | CompanyTailoredOutput;
+}) {
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -184,7 +331,7 @@ function DownloadDocxButton({ tailored }: { tailored: TailoredOutput }) {
   return (
     <div className="flex flex-col gap-2 sm:flex-1">
       <Button onClick={onClick} disabled={busy} fullWidth>
-        {busy ? "Building .docx…" : "Download as .docx"}
+        {busy ? "Building .docx…" : "Download resume as .docx"}
       </Button>
       {err && (
         <p className="text-xs text-forge-red" role="alert">

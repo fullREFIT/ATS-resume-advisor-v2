@@ -7,6 +7,8 @@ import { InfoBlock } from "@/components/ui/InfoBlock";
 import { callApi } from "@/lib/api-fetch";
 import { loadSession, patchSession } from "@/lib/storage";
 import type {
+  CompanyTailoredOutput,
+  IntakeMode,
   Question,
   QuestionsResponse,
   TailoredOutput,
@@ -16,23 +18,43 @@ const MIN_ANSWER_LEN = 20;
 
 export function RefinePageClient() {
   const router = useRouter();
+  const [mode, setMode] = useState<IntakeMode>("role");
   const [questions, setQuestions] = useState<Question[] | null>(null);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [resume, setResume] = useState("");
   const [jd, setJd] = useState("");
+  const [companyContent, setCompanyContent] = useState("");
+  const [companyUrl, setCompanyUrl] = useState("");
+  const [desiredRole, setDesiredRole] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const s = loadSession();
-    if (!s.questions || !s.resume || !s.jd) {
+    if (!s.questions || !s.resume) {
       router.replace("/");
       return;
+    }
+    if (s.mode === "company") {
+      if (!s.companyContent) {
+        router.replace("/");
+        return;
+      }
+      setMode("company");
+      setCompanyContent(s.companyContent.text);
+      setCompanyUrl(s.companyContent.url);
+      setDesiredRole(s.desiredRole);
+    } else {
+      if (!s.jd) {
+        router.replace("/");
+        return;
+      }
+      setMode("role");
+      setJd(s.jd);
     }
     setQuestions((s.questions as QuestionsResponse).questions);
     setAnswers(s.answers ?? {});
     setResume(s.resume);
-    setJd(s.jd);
   }, [router]);
 
   if (!questions) {
@@ -58,22 +80,45 @@ export function RefinePageClient() {
         question: q.question,
         answer: answers[q.id] ?? "",
       }));
-      const data = await callApi<
-        {
-          resume: string;
-          jd: string;
-          intakeAnswers: { question: string; answer: string }[];
-        },
-        { output?: TailoredOutput; guarded?: boolean }
-      >({
-        endpoint: "output",
-        body: { resume, jd, intakeAnswers },
-      });
-      if (!data.output) {
-        throw new Error("Failed to generate output.");
+      if (mode === "company") {
+        const data = await callApi<
+          {
+            resume: string;
+            companyContent: string;
+            companyUrl: string;
+            desiredRole?: string;
+            intakeAnswers: { question: string; answer: string }[];
+          },
+          { output?: CompanyTailoredOutput }
+        >({
+          endpoint: "company-output",
+          body: {
+            resume,
+            companyContent,
+            companyUrl,
+            desiredRole: desiredRole || undefined,
+            intakeAnswers,
+          },
+        });
+        if (!data.output) throw new Error("Failed to generate output.");
+        patchSession({ companyTailored: data.output });
+        router.push("/result");
+      } else {
+        const data = await callApi<
+          {
+            resume: string;
+            jd: string;
+            intakeAnswers: { question: string; answer: string }[];
+          },
+          { output?: TailoredOutput }
+        >({
+          endpoint: "output",
+          body: { resume, jd, intakeAnswers },
+        });
+        if (!data.output) throw new Error("Failed to generate output.");
+        patchSession({ tailored: data.output });
+        router.push("/result");
       }
-      patchSession({ tailored: data.output });
-      router.push("/result");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed.");
     } finally {
@@ -90,13 +135,15 @@ export function RefinePageClient() {
         </h1>
         <p className="text-base text-carbon-core">
           Specific answers — outcomes, numbers, tools — produce stronger
-          bullets. Vague answers produce vague output.
+          {mode === "company" ? " positioning" : " bullets"}. Vague answers
+          produce vague output.
         </p>
       </div>
 
       <InfoBlock>
-        The AI will use ONLY what you tell it here plus what&apos;s already in
-        your resume. Nothing else gets fabricated.
+        {mode === "company"
+          ? "The AI will use ONLY what you tell it here plus what's in your resume. Claims about the company are checked against the site content. Nothing fabricated."
+          : "The AI will use ONLY what you tell it here plus what's already in your resume. Nothing else gets fabricated."}
       </InfoBlock>
 
       <ol className="flex flex-col gap-4">
@@ -154,14 +201,16 @@ export function RefinePageClient() {
         >
           {loading
             ? "Tailoring + fact-checking… (about 30 seconds)"
-            : "Generate tailored resume"}
+            : mode === "company"
+              ? "Generate tailored resume + outreach"
+              : "Generate tailored resume"}
         </Button>
         <Button
           variant="secondary"
           onClick={() => router.push("/diagnose")}
           className="sm:w-auto"
         >
-          Back to diagnosis
+          Back
         </Button>
       </div>
     </>

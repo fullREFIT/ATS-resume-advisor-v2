@@ -9,10 +9,13 @@ import {
   TextRun,
   type IRunOptions,
 } from "docx";
-import type { TailoredOutput } from "./types";
+import type {
+  CompanyTailoredOutput,
+  TailoredOutput,
+} from "./types";
 
 interface BuildArgs {
-  tailored: TailoredOutput;
+  tailored: TailoredOutput | CompanyTailoredOutput;
 }
 
 const FONT = "Calibri";
