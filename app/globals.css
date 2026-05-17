@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+/*
+ * Carbon Forge — light mode, canonical palette.
+ * Hex values are load-bearing — do not substitute.
+ */
+:root {
+  --carbon-core: #121010;
+  --forge-red: #D43B2A;
+  --forge-red-hover: #B8301F;
+  --forge-gold: #FFB400;
+  --forge-dark: #333130;
+  --ash-white: #F2F0EE;
+  --pure-white: #FFFFFF;
+  --echo: #878E88;
+  --soft-gray: #E5E3E0;
+}
+
+@theme inline {
+  --color-carbon-core: var(--carbon-core);
+  --color-forge-red: var(--forge-red);
+  --color-forge-red-hover: var(--forge-red-hover);
+  --color-forge-gold: var(--forge-gold);
+  --color-forge-dark: var(--forge-dark);
+  --color-ash-white: var(--ash-white);
+  --color-pure-white: var(--pure-white);
+  --color-echo: var(--echo);
+  --color-soft-gray: var(--soft-gray);
+  --font-sans: var(--font-outfit), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, SFMono-Regular, monospace;
+}
+
+html,
+body {
+  background: var(--ash-white);
+  color: var(--carbon-core);
+  font-family: var(--font-outfit), system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* No italics anywhere — per brand spec. */
+em,
+i,
+cite,
+address {
+  font-style: normal;
+}
+
+/* Section label utility — JetBrains Mono 600, 0.6875rem, UPPERCASE, 0.12em, Forge Red. */
+.section-label {
+  font-family: var(--font-jetbrains-mono), ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--forge-red);
+}
+
+/* Card surface. */
+.card-surface {
+  background: var(--pure-white);
+  border: 1px solid var(--soft-gray);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+/* Layer 1 card — system content with Forge Red top border. */
+.card-layer-1 {
+  background: var(--pure-white);
+  border: 1px solid var(--soft-gray);
+  border-top: 3px solid var(--forge-red);
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+}
+
+/* Prevent iOS auto-zoom on input focus. */
+input,
+select,
+textarea,
+button {
+  font-size: 16px;
+}

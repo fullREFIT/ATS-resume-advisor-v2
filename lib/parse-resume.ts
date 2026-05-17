@@ -1,0 +1,63 @@
+import "server-only";
+
+const MIN_OK_CHARS = 500;
+const MAX_BYTES = 4 * 1024 * 1024;
+
+export interface ParseResult {
+  text: string;
+  charCount: number;
+  needsPaste: boolean;
+  warning?: string;
+}
+
+export async function parseResumeBuffer(
+  fileName: string,
+  buffer: Buffer,
+): Promise<ParseResult> {
+  if (buffer.byteLength > MAX_BYTES) {
+    throw new Error(
+      "File is too large (max 4MB). Paste plain text instead.",
+    );
+  }
+  const lower = fileName.toLowerCase();
+  let text = "";
+
+  if (lower.endsWith(".pdf")) {
+    const { extractText, getDocumentProxy } = await import("unpdf");
+    const u8 = new Uint8Array(buffer);
+    const doc = await getDocumentProxy(u8);
+    const { text: pages } = await extractText(doc, { mergePages: true });
+    text = Array.isArray(pages) ? pages.join("\n") : (pages as string);
+  } else if (lower.endsWith(".docx")) {
+    const mammoth = await import("mammoth");
+    const { value } = await mammoth.extractRawText({ buffer });
+    text = value;
+  } else if (lower.endsWith(".txt") || lower.endsWith(".md")) {
+    text = buffer.toString("utf8");
+  } else if (lower.endsWith(".pages")) {
+    throw new Error(
+      "Apple Pages files (.pages) aren't supported. In Pages, choose File → Export To → PDF or Word, then upload that.",
+    );
+  } else if (lower.endsWith(".doc")) {
+    throw new Error(
+      "Old-format .doc files aren't supported. Save as .docx (File → Save As → Word Document) or paste plain text.",
+    );
+  } else {
+    throw new Error(
+      "Unsupported file type. Upload .pdf or .docx, or paste plain text.",
+    );
+  }
+
+  const trimmed = (text ?? "").replace(/ /g, " ").trim();
+  const charCount = trimmed.length;
+  if (charCount < MIN_OK_CHARS) {
+    return {
+      text: trimmed,
+      charCount,
+      needsPaste: true,
+      warning:
+        "We only parsed a small amount of text from this file (likely an image-based PDF, multi-column layout, or unusual format). Paste plain text below instead — that's also what ATS systems see.",
+    };
+  }
+  return { text: trimmed, charCount, needsPaste: false };
+}

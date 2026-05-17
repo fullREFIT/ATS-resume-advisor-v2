@@ -1,0 +1,157 @@
+AI RESUME ADVISOR — BUILD & ITERATION SUMMARY
+
+Live at: https://ats-resume-advisor.vercel.app
+Source: https://github.com/fullREFIT/ATS-resume-advisor
+
+
+WHAT THIS TOOL DOES
+
+A free web app that takes a resume + a job description and produces:
+
+1. An honest match score (0–100) with a verdict (GO, FIX FIRST, or PASS) and a breakdown of WHY, scored across four components (keyword match, experience relevance, trajectory fit, ATS parsing), each with its own score and a one-sentence note.
+
+2. Five targeted intake questions that surface real evidence the resume undersold (STAR stories, quantified outcomes, claimed-vs-demonstrated skill gaps).
+
+3. A tailored resume with each role preserved (company, title, dates) and bullets rewritten using exact language from the job description, never invented experience.
+
+4. A downloadable ATS-safe Word document (Calibri 11pt, single column, standard headings, no tables or images) which is what every applicant tracking system parses cleanly.
+
+5. Interview prep, including likely questions, STAR stories to prepare, and weak-spot responses.
+
+The "no fabrication" guarantee runs three guardrails:
+- System prompt forbids inventing tools, metrics, roles, or outcomes.
+- Socratic intake forces real evidence into the input before tailoring runs.
+- A second model call fact-checks every bullet against the resume + intake answers. Rejected bullets get regenerated with stricter constraints.
+
+No signup. No API key required. Work persists across browser refreshes via browser-local storage. Nothing is stored on a server.
+
+
+V1 BUILD (initial 12-step delivery)
+
+Step 1: Next.js scaffold, Carbon Forge brand layer, mobile-first responsive frame.
+Step 2: Lib layer (Anthropic SDK wrapper with smart model routing using Haiku for cheap structured tasks and Sonnet for tailored output, 4 system prompts, localStorage helpers, rate-limit helper).
+Step 3: Server-side API routes (diagnose, questions, output).
+Step 4: Intake screen (paste resume + JD, ATS context block, localStorage disclaimer).
+Step 5: Diagnose + refine screens with state persistence across refresh.
+Step 6: Result screen with fabrication guard integrated.
+Step 7: PDF and DOCX file upload.
+Step 8: ATS-safe Word export. Contact info in document body, not Word header, because most parsers skip headers.
+Step 9: Bring-Your-Own-Key optional mode (later removed).
+Step 10: About page (methodology, ATS myth-bust, no-fabrication promise).
+Step 11: Mobile QA (Playwright iPhone SE emulation, no horizontal scroll, primary CTAs 48px, inputs 16px or larger to prevent iOS auto-zoom).
+Step 12: Vercel production deploy.
+
+All 11 self-verification gates passed at v1 release.
+
+
+DESIGN-FEEDBACK ROUND
+
+Removed:
+- "Use my own key" header link, dialog, and BYOK API routes. Confused non-developer users, contrary to the "no API keys for users" decision.
+- "Which ATS does this company use?" dropdown. Noise. Almost no user knows which ATS the company uses.
+
+
+BUG-FIX ROUND (after Nic's real-world test)
+
+Nic surfaced four real failures by trying the tool with his current resume against the Closers.io Sales Manager job description. Each one is now fixed.
+
+1. PDF upload was broken.
+   What he saw: "It wouldn't accept or upload my pdf."
+   Root cause: The pdf-parse library's default export wasn't working under Next.js 16. Every upload threw an error.
+   Fix: Swapped pdf-parse for unpdf (ESM-native, serverless-friendly). Verified end-to-end. 5,000+ character PDFs parse in about 200ms locally and on production.
+   Bonus: Clear error messages for .pages (Apple Pages, tells the user to export to PDF) and .doc (old Word format, tells them to save as .docx).
+
+2. Output was a half-page flat bullet list with no companies, no titles, no dates.
+   What he saw: "It doesn't keep the experience from the companies, it just gives bullet points."
+   Root cause: Original output schema was a flat array of bullets, capped at "5 to 7 total." The Word renderer collapsed everything under one WORK EXPERIENCE heading.
+   Fix: Restructured the entire output contract so each role is preserved as its own entry with company, title, dates, location, and 3 to 5 bullets nested under it. Result page renders structured sections per role. .docx export renders each role with its own header and bullets.
+   Result: Nic's case now produces 4 roles, 17 bullets (versus 7 flat bullets in v1).
+
+3. Bullets didn't use the exact language from the job description.
+   What Paul said: "Why did it create a resume that did not fully incorporate the exact language from the job description? That's the whole point of this process."
+   Root cause: The old prompt said "mirror JD language" but allowed semantic equivalents (e.g., "distributed sales group" instead of "remote sales team").
+   Fix: The prompt now requires EXACT JD phrases. No paraphrasing of primary keywords. The model now also returns BOTH a list of keywords it integrated AND a list of keywords it couldn't integrate, with the reason for each miss.
+   Result: Nic's new output uses 13 verbatim JD phrases including: remote high-ticket sales operations, daily call reviews, daily sales meetings and pipeline reviews, coach reps on sales skills/objection handling/closing techniques, recruit/hire/onboard new sales representatives, refine sales processes/tools/workflows, elite-level closers and setters, business owners/CEOs, fast-paced high-performance environments, founder-led multi-figure revenue brands, KPIs, monitor rep performance against targets, remote sales teams. One honestly flagged as missed: "business coaching and consulting industry" (no direct industry experience to cite).
+
+4. Diagnosis reasoning was too thin for a 62/100 score.
+   What Paul said: "If it's going to rate somebody's resume 62 out of 100 for this job, it needs to provide a pretty thorough description as to why it scored it the way it did."
+   Root cause: Original diagnosis returned only a 2-sentence reasoning.
+   Fix: Diagnosis now returns a score breakdown with 4 components (keyword match, experience relevance, trajectory fit, ATS parsing), each scored 0 to 100 with a one-sentence note. The verdict reasoning expanded to 3 to 5 sentences that explicitly name which components drove the score. The Diagnose screen renders this as a "Why this score" panel with progress bars.
+
+Additional fixes in the same round:
+
+5. Stale browser data would crash the result page.
+   Users with localStorage from before the schema change would hit a render error because the old data shape didn't match the new one.
+   Fix: Bumped storage key to v2. Old v1 data is silently purged on load. No crash.
+
+6. Output JSON was truncating at the model's token limit.
+   After restructuring the output schema, 4 to 5 role resumes exceeded the previous token ceiling. Output truncated mid-JSON. The route returned a 500 error.
+   Fix: Raised the output task's token budget to cover 4 to 5 role resumes with full metadata.
+
+7. Contact info was being corrupted (e.g., "Dacula, GAnd nicshafer1@gmail.com").
+   The old code used a regex over a joined text blob and accidentally picked up "GA\\nAnd" as one match.
+   Fix: The model now extracts contact info directly into structured fields (name, email, phone, LinkedIn, location). No more regex on a joined blob.
+
+
+BEFORE / AFTER FOR NIC SPECIFICALLY
+
+Same resume (his current Pages file exported to PDF), same Closers.io job description.
+
+Match score:
+   v1: 62/100 FIX FIRST (on OLD resume because he couldn't upload his current one)
+   v2: 72/100 GO
+
+Reasoning:
+   v1: 2 sentences
+   v2: 3 to 5 sentences plus 4-component score breakdown with progress bars
+
+Roles in output:
+   v1: 0 (flat list)
+   v2: 4 (each with company, title, dates)
+
+Bullets:
+   v1: 7 total
+   v2: 17 (3 to 5 per role)
+
+Exact JD phrases used:
+   v1: about 5, mostly paraphrased
+   v2: 13 verbatim
+
+Missed keywords surfaced honestly:
+   v1: 0
+   v2: 1 with explicit reason
+
+Contact line:
+   v1: corrupted ("Dacula, GAnd nicshafer1@gmail.com")
+   v2: clean ("Dacula, GA  |  (424) 443-9233  |  nicshafer1@gmail.com")
+
+PDF upload:
+   v1: broken
+   v2: works
+
+
+WHAT NIC SHOULD DO NOW
+
+1. Open his current resume (Nic Shafer Resume Template.pages) in Pages.
+2. File > Export To > PDF. Save as Nic_Shafer_Resume.pdf.
+3. Go to https://ats-resume-advisor.vercel.app (clear browser data first if he ran a session earlier).
+4. Upload the PDF, paste the Closers.io job description.
+5. Run through diagnose, the 5 intake questions, then result.
+6. On the result screen, click "Download as .docx" for the ATS-safe Word file.
+
+He can use the bullets as-is or open the .docx in Word and refine anything that doesn't sound like him. He's signing the resume. Final wording is his call.
+
+The rate limit is currently off, so he can use it as much as he needs.
+
+
+OPEN ITEMS (not blocking Nic's use)
+
+Upstash rate limit not yet configured. The tool works without it. The risk is unbounded cost from a viral spike. To address before sharing publicly beyond friends-and-family: one-click Vercel/Upstash integration, no code change.
+
+Anthropic monthly billing alert at $150. A hard cap on demo cost in case of abuse. Set in the Anthropic console before broad sharing.
+
+Apple Pages files not natively supported. Would require macOS Pages.app at parse time. Vercel runs on Linux. A clear error message tells users to export to PDF instead. Leaving as-is.
+
+Optional 6th intake question: "Anything significant NOT on this resume?" Would catch stale-resume cases like Nic's first attempt. Worth adding if it shows up again with a different user.
+
+Optional "Coach mode" toggle (suggestions instead of rewrites). A different product mode if you want a more educational variant alongside the current rewrite mode.
