@@ -1,26 +1,9 @@
-export type Verdict = "GO" | "FIX_FIRST" | "PASS";
+// Shared
+export type IntakeMode = "role" | "company";
 
 export interface ScoreBreakdownComponent {
   score: number;
   note: string;
-}
-
-export interface ScoreBreakdown {
-  keywordMatch: ScoreBreakdownComponent;
-  experienceRelevance: ScoreBreakdownComponent;
-  trajectoryFit: ScoreBreakdownComponent;
-  atsParsing: ScoreBreakdownComponent;
-}
-
-export interface Diagnosis {
-  matchScore: number;
-  verdict: Verdict;
-  verdictReasoning: string;
-  scoreBreakdown: ScoreBreakdown;
-  topMatches: string[];
-  criticalGaps: string[];
-  atsParsingFlags: string[];
-  trajectoryNote: string;
 }
 
 export interface Question {
@@ -61,6 +44,27 @@ export interface InterviewPrep {
   weakSpotResponses: string[];
 }
 
+// Role mode (existing JD-matching flow)
+export type Verdict = "GO" | "FIX_FIRST" | "PASS";
+
+export interface ScoreBreakdown {
+  keywordMatch: ScoreBreakdownComponent;
+  experienceRelevance: ScoreBreakdownComponent;
+  trajectoryFit: ScoreBreakdownComponent;
+  atsParsing: ScoreBreakdownComponent;
+}
+
+export interface Diagnosis {
+  matchScore: number;
+  verdict: Verdict;
+  verdictReasoning: string;
+  scoreBreakdown: ScoreBreakdown;
+  topMatches: string[];
+  criticalGaps: string[];
+  atsParsingFlags: string[];
+  trajectoryNote: string;
+}
+
 export interface TailoredOutput {
   contact: ContactInfo;
   summary: string;
@@ -71,19 +75,69 @@ export interface TailoredOutput {
   interviewPrep: InterviewPrep;
 }
 
+// Company mode (new proactive cold-outreach flow)
+export interface CompanyFit {
+  companyName: string;
+  valuesObserved: string[];
+  rolesLikelyHired: string[];
+  whereBackgroundMaps: string[];
+  outreachGaps: string[];
+  confidenceNote: string;
+}
+
+export interface ColdOutreachAngle {
+  positioning: string;
+  draftMessage: string;
+}
+
+export interface CompanyTailoredOutput {
+  contact: ContactInfo;
+  summary: string;
+  experience: ExperienceEntry[];
+  skills: string[];
+  companyHooksUsed: string[];
+  coldOutreachAngle: ColdOutreachAngle;
+  interviewPrep: InterviewPrep;
+}
+
+export interface FetchedCompanyContent {
+  url: string;
+  fetchedAt: number;
+  text: string;
+  charCount: number;
+  warning?: string;
+}
+
+// Session — discriminated by mode, but flattened for simple localStorage shape.
 export interface SessionState {
+  mode: IntakeMode;
   resume: string;
+
+  // Role mode fields
   jd: string;
   diagnosis?: Diagnosis;
+
+  // Company mode fields
+  companyUrl: string;
+  desiredRole: string;
+  companyContent?: FetchedCompanyContent;
+  companyFit?: CompanyFit;
+
+  // Shared
   questions?: QuestionsResponse;
   answers: Record<string, string>;
   tailored?: TailoredOutput;
+  companyTailored?: CompanyTailoredOutput;
+
   updatedAt: number;
 }
 
 export const EMPTY_SESSION: SessionState = {
+  mode: "role",
   resume: "",
   jd: "",
+  companyUrl: "",
+  desiredRole: "",
   answers: {},
   updatedAt: 0,
 };
