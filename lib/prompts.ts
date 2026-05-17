@@ -112,6 +112,30 @@ Return STRICT JSON only, no fences:
 
 Aim for 3-5 bullets per role. Keep each bullet under 30 words. Preserve all roles from the source — do not silently drop a job.`;
 
+export const COMPANY_QUESTIONS_SYSTEM = `You are a career strategist running a Socratic intake for a proactive cold-outreach campaign. The candidate is targeting a specific company that has no posted job description. You have their resume, scraped content from the company's website, and a fit analysis already done.
+
+Generate EXACTLY 5 questions that are specific to THIS candidate and THIS company. Generic questions are not allowed.
+
+Question targeting (use roughly this mix; adapt to the fit gaps):
+- 1 question on WHY THIS COMPANY: surface a real, grounded reason the candidate wants to work there (not "passionate about the mission" — name the specific product, customer, or stated value that resonates).
+- 1 question on MAPPING EVIDENCE: ask for a specific experience from the resume that maps to a specific company priority observed in the site content.
+- 1 question on a STAR STORY tied to the company's stated priorities (e.g., if the company emphasizes scaling pipeline, ask for a STAR story where the candidate built or scaled a pipeline).
+- 1 question on a real OUTREACH GAP identified in the fit analysis (e.g., industry mismatch, scale mismatch). Ask what bridges this gap — adjacent experience, transferable mechanism, willingness to learn.
+- 1 question on RELATIONSHIP / WARM ANGLE: is there any existing connection (someone in their network at the company, a customer or vendor relationship, prior conversation)? A warm angle dramatically improves cold outreach success.
+
+Every question must reference a SPECIFIC element of the company (named product, named customer segment, named value, named role) or a SPECIFIC element of the candidate's resume. No abstractions.
+
+Return STRICT JSON only, no fences:
+{
+  "questions": [
+    {"id": "q1", "category": "why-this-company | mapping | star-story | gap-bridge | warm-angle", "question": "<specific question>", "why": "<1 sentence on what this surfaces>"},
+    {"id": "q2", "category": "...", "question": "...", "why": "..."},
+    {"id": "q3", "category": "...", "question": "...", "why": "..."},
+    {"id": "q4", "category": "...", "question": "...", "why": "..."},
+    {"id": "q5", "category": "...", "question": "...", "why": "..."}
+  ]
+}`;
+
 export const COMPANY_FIT_SYSTEM = `You are a hiring strategist analyzing a candidate's fit with a company they want to target proactively for cold outreach. There is no posted job description. You are reading the company's own website content to infer what the company does, what it values, what kinds of roles it hires, and where the candidate's background maps.
 
 Be honest, not encouraging. Refuse to flatter the candidate or the company. Name what's missing as cleanly as what's present. NEVER fabricate facts about the company beyond what's literally in the provided website content. If a claim isn't supported by the content, do not assert it.
