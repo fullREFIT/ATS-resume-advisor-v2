@@ -78,3 +78,16 @@ The fabrication guard already runs against the candidate's bullets vs. the resum
 - Same Carbon Forge palette.
 - Same Anthropic model routing (Haiku for diagnose/questions/fact-check, Sonnet for output).
 - Vercel hobby plan 60-second function limit still applies — keep retry budgets tight.
+
+## Status (2026-05-16)
+
+Company-mode flow shipped end-to-end on v2 production at https://ats-resume-advisor-v2.vercel.app. v1 untouched at https://ats-resume-advisor.vercel.app.
+
+Build order (a) through (h) all complete. End-to-end dogfood: Nic's resume vs. gong.io produced grounded positioning + draft message with both fact-check gates passing on first attempt. LinkedIn URL rejection returns clean 400 with actionable error.
+
+What's not yet built (deliberately, out of v2 scope):
+- 6th intake question to catch stale-resume cases
+- Coach-mode toggle (suggestions instead of rewrites)
+- Native .pages parsing
+- Upstash rate limit live
+- Anthropic $150/month billing alert
