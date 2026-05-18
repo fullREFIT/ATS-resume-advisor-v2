@@ -27,14 +27,14 @@ export function ResultPageClient() {
     const s = loadSession();
     if (s.mode === "company") {
       if (!s.companyTailored) {
-        router.replace("/");
+        router.replace("/start");
         return;
       }
       setMode("company");
       setCompanyTailored(s.companyTailored);
     } else {
       if (!s.tailored) {
-        router.replace("/");
+        router.replace("/start");
         return;
       }
       setMode("role");
@@ -45,7 +45,7 @@ export function ResultPageClient() {
 
   function onStartOver() {
     clearSession();
-    router.push("/");
+    router.push("/start");
   }
 
   if (!session) {

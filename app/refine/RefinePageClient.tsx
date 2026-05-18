@@ -32,12 +32,12 @@ export function RefinePageClient() {
   useEffect(() => {
     const s = loadSession();
     if (!s.questions || !s.resume) {
-      router.replace("/");
+      router.replace("/start");
       return;
     }
     if (s.mode === "company") {
       if (!s.companyContent) {
-        router.replace("/");
+        router.replace("/start");
         return;
       }
       setMode("company");
@@ -46,7 +46,7 @@ export function RefinePageClient() {
       setDesiredRole(s.desiredRole);
     } else {
       if (!s.jd) {
-        router.replace("/");
+        router.replace("/start");
         return;
       }
       setMode("role");

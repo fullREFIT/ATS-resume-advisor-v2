@@ -103,7 +103,7 @@ export default function AboutPage() {
 
         <div>
           <Link
-            href="/"
+            href="/start"
             className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-forge-red hover:text-forge-red-hover"
           >
             ← Back to the tool

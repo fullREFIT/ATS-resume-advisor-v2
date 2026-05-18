@@ -30,7 +30,7 @@ export function DiagnosePageClient() {
     const s = loadSession();
     if (s.mode === "company") {
       if (!s.companyFit || !s.resume || !s.companyContent) {
-        router.replace("/");
+        router.replace("/start");
         return;
       }
       setMode("company");
@@ -40,7 +40,7 @@ export function DiagnosePageClient() {
       setDesiredRole(s.desiredRole);
     } else {
       if (!s.diagnosis || !s.resume || !s.jd) {
-        router.replace("/");
+        router.replace("/start");
         return;
       }
       setMode("role");
@@ -107,7 +107,7 @@ export function DiagnosePageClient() {
 
   function onStartOver() {
     clearSession();
-    router.push("/");
+    router.push("/start");
   }
 
   return (
