@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { callClaude, classifyError, parseJson } from "@/lib/claude";
 import { QUESTIONS_SYSTEM } from "@/lib/prompts";
-import { consumeQuota } from "@/lib/ratelimit";
+import { consumeQuota, rateLimitWarning } from "@/lib/ratelimit";
 import type { Diagnosis, QuestionsResponse } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -81,7 +81,7 @@ Generate exactly 5 Socratic intake questions targeting the gaps and claimed-vs-d
         { status: 502 },
       );
     }
-    return NextResponse.json({ questions: parsed, rateLimit: quota });
+    return NextResponse.json({ questions: parsed, rateLimit: quota, rateLimitEnforced: quota.enforced, warning: rateLimitWarning(quota) });
   } catch (err) {
     const c = classifyError(err);
     return NextResponse.json(

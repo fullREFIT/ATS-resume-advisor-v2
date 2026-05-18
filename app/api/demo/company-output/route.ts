@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { classifyError } from "@/lib/claude";
 import { runCompanyOutputFlow } from "@/lib/company-output-flow";
-import { consumeQuota } from "@/lib/ratelimit";
+import { consumeQuota, rateLimitWarning } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -81,6 +81,8 @@ export async function POST(req: Request) {
       companyGuardPassed: result.companyGuardPassed,
       attempts: result.attempts,
       rateLimit: quota,
+      rateLimitEnforced: quota.enforced,
+      warning: rateLimitWarning(quota),
     });
   } catch (err) {
     const c = classifyError(err);

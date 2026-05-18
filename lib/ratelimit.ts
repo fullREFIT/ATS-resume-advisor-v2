@@ -51,6 +51,7 @@ export interface RateLimitResult {
   remaining: number;
   reset: number;
   limit: number;
+  enforced: boolean;
 }
 
 function isBypassToken(req: Request): boolean {
@@ -61,11 +62,11 @@ function isBypassToken(req: Request): boolean {
 
 export async function consumeQuota(req: Request): Promise<RateLimitResult> {
   if (isBypassToken(req)) {
-    return { allowed: true, remaining: 999, reset: 0, limit: 999 };
+    return { allowed: true, remaining: 999, reset: 0, limit: 999, enforced: false };
   }
   const limiter = getLimiter();
   if (!limiter) {
-    return { allowed: true, remaining: 999, reset: 0, limit: 999 };
+    return { allowed: true, remaining: 999, reset: 0, limit: 999, enforced: false };
   }
   const ip = getClientIp(req);
   const r = await limiter.limit(ip);
@@ -74,5 +75,11 @@ export async function consumeQuota(req: Request): Promise<RateLimitResult> {
     remaining: r.remaining,
     reset: r.reset,
     limit: r.limit,
+    enforced: true,
   };
+}
+
+export function rateLimitWarning(result: RateLimitResult): string | undefined {
+  if (result.enforced) return undefined;
+  return "Rate limit not enforced. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel.";
 }

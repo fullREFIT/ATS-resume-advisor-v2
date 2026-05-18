@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { callClaude, classifyError, parseJson } from "@/lib/claude";
 import { COMPANY_QUESTIONS_SYSTEM } from "@/lib/prompts";
-import { consumeQuota } from "@/lib/ratelimit";
+import { consumeQuota, rateLimitWarning } from "@/lib/ratelimit";
 import type { CompanyFit, QuestionsResponse } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -92,7 +92,7 @@ ${desiredRole ? `Candidate's desired role: ${desiredRole}\n\n` : ""}Generate exa
         { status: 502 },
       );
     }
-    return NextResponse.json({ questions: parsed, rateLimit: quota });
+    return NextResponse.json({ questions: parsed, rateLimit: quota, rateLimitEnforced: quota.enforced, warning: rateLimitWarning(quota) });
   } catch (err) {
     const c = classifyError(err);
     return NextResponse.json(
