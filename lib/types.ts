@@ -108,6 +108,19 @@ export interface FetchedCompanyContent {
   warning?: string;
 }
 
+// Target-person discovery (proactive cold-outreach extension)
+export interface TargetPersonArchetype {
+  roleTitle: string;
+  whyThisRole: string;
+  openingLine: string;
+  linkedinSearchString: string;
+  salesNavSearchHint: string;
+}
+
+export interface TargetPersonsResponse {
+  archetypes: TargetPersonArchetype[];
+}
+
 // Session — discriminated by mode, but flattened for simple localStorage shape.
 export interface SessionState {
   mode: IntakeMode;
@@ -128,6 +141,7 @@ export interface SessionState {
   answers: Record<string, string>;
   tailored?: TailoredOutput;
   companyTailored?: CompanyTailoredOutput;
+  targetPersons?: TargetPersonsResponse;
 
   updatedAt: number;
 }
