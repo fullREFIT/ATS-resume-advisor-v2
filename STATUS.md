@@ -31,3 +31,9 @@ The build environment can't open Safari on a physical iPhone SE or BrowserStack 
 
 ### 2026-05-11 — Upstash rate limit NOT enforced in production
 The Vercel project has `ANTHROPIC_API_KEY`, `DEMO_DAILY_LIMIT`, and `ANTHROPIC_MONTHLY_BUDGET_USD` set. `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` are NOT configured — `lib/ratelimit.ts` falls back to allow-all. **Action for Paul:** add the Upstash Redis integration to this Vercel project (Settings → Integrations → Upstash), which auto-populates both env vars; then redeploy. No code change required. Until then, every demo request consumes the demo Anthropic key without per-IP capping.
+
+### 2026-05-18 — Target-person discovery shipped + rate-limit observability
+- Target-person discovery feature live on company-mode result page.
+- `/api/demo/target-persons` route added. One Haiku 4.5 call, no fact-check guard (prompt-constrained).
+- `rateLimitEnforced` + `warning` fields now surfaced on every `/api/demo/*` response.
+- `docs/tone-of-voice/` relocated to fullREFIT content-command-center _inbox.

@@ -91,3 +91,14 @@ What's not yet built (deliberately, out of v2 scope):
 - Native .pages parsing
 - Upstash rate limit live
 - Anthropic $150/month billing alert
+
+## Status (2026-05-18)
+
+Target-person discovery shipped on v2 production. Company-mode result page now closes the loop from "great message" to "great message sent to the right person" — 3-5 role archetypes with tailored opening lines and copy-pastable LinkedIn search strings.
+
+Launch readiness:
+- Rate-limit observability: shipped (rateLimitEnforced surfaced in all API responses).
+- Upstash live in Vercel: pending RUNBOOK-01
+- Anthropic $150/mo billing cap: pending RUNBOOK-02
+- Real-device iPhone Safari QA: pending RUNBOOK-03.
+- docs/tone-of-voice/ misplaced files: relocated.
