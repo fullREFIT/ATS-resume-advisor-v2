@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit, JetBrains_Mono } from "next/font/google";
+import { BugReporter } from "@/components/BugReporter";
+import { BypassCapture } from "@/components/BypassCapture";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -15,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AI Resume Advisor — Honest diagnosis, ATS-optimized output",
+  title: "Nic's AI Resume Advisor — Honest Diagnosis, ATS-Optimized Output",
   description:
     "Diagnose your resume against any job description. Honest verdict, no fabrication, ATS-safe tailoring. Free.",
 };
@@ -37,7 +39,9 @@ export default function RootLayout({
       className={`${outfit.variable} ${jetbrainsMono.variable}`}
     >
       <body className="min-h-screen flex flex-col bg-ash-white text-carbon-core">
+        <BypassCapture />
         {children}
+        <BugReporter />
       </body>
     </html>
   );

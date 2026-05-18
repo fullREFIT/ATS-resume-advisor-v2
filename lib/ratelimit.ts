@@ -53,7 +53,16 @@ export interface RateLimitResult {
   limit: number;
 }
 
+function isBypassToken(req: Request): boolean {
+  const token = req.headers.get("x-bypass-token");
+  const validToken = process.env.BYPASS_TOKEN;
+  return !!(validToken && token && token === validToken);
+}
+
 export async function consumeQuota(req: Request): Promise<RateLimitResult> {
+  if (isBypassToken(req)) {
+    return { allowed: true, remaining: 999, reset: 0, limit: 999 };
+  }
   const limiter = getLimiter();
   if (!limiter) {
     return { allowed: true, remaining: 999, reset: 0, limit: 999 };

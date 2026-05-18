@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata = {
-  title: "AI Resume Advisor — Honest Diagnosis, ATS-Optimized Output",
+  title: "Nic's AI Resume Advisor — Honest Diagnosis, ATS-Optimized Output",
   description:
     "Diagnose your resume against any job description. Get an honest score, understand exactly why you're ranked low, and download an ATS-safe tailored resume. No account. No fabrication. Free.",
 };
@@ -58,7 +58,7 @@ export default function LandingPage() {
 
         {/* ── HERO ── */}
         <section className="flex flex-col gap-5 py-10 sm:py-14">
-          <p className="section-label">Free AI Resume Tool</p>
+          <p className="section-label">Nic&apos;s AI Resume Advisor — Free</p>
           <h1 className="text-3xl font-semibold leading-tight tracking-tight text-carbon-core sm:text-4xl">
             Your resume isn&apos;t getting callbacks.
             <br className="hidden sm:block" /> Here&apos;s exactly why.
@@ -156,6 +156,96 @@ export default function LandingPage() {
               body="Your experience rewritten with exact language from the job description — your evidence, nothing invented. Every role preserved with company, title, and dates. ATS-safe Word document ready to submit."
             />
           </div>
+        </section>
+
+        {/* ── SOCIAL PROOF ── */}
+        <section className="flex flex-col gap-6 border-t border-soft-gray py-10">
+          <div className="flex flex-col gap-2">
+            <p className="section-label">Real results</p>
+            <h2 className="text-xl font-semibold tracking-tight text-carbon-core sm:text-2xl">
+              Same resume. Same role. One session.
+            </h2>
+            <p className="text-sm leading-relaxed text-carbon-core">
+              A sales leader ran his current resume against a Sales Manager job
+              description. Here&apos;s what changed.
+            </p>
+          </div>
+
+          <div className="overflow-hidden rounded-xl border border-soft-gray">
+            {/* Column headers */}
+            <div className="grid grid-cols-2 divide-x divide-soft-gray">
+              <div className="bg-ash-white px-4 py-2">
+                <p className="section-label !text-echo">Before</p>
+              </div>
+              <div className="bg-pure-white px-4 py-2">
+                <p className="section-label">After</p>
+              </div>
+            </div>
+
+            {/* Rows */}
+            {[
+              {
+                label: "Match score",
+                before: "62 / 100",
+                after: "72 / 100",
+              },
+              {
+                label: "Verdict",
+                before: "FIX FIRST",
+                after: "GO",
+                highlight: true,
+              },
+              {
+                label: "Role entries",
+                before: "0 (flat bullet list)",
+                after: "4 (with company, title, dates)",
+              },
+              {
+                label: "Total bullets",
+                before: "7",
+                after: "17",
+              },
+              {
+                label: "Verbatim JD phrases",
+                before: "~5 (paraphrased)",
+                after: "13 exact",
+              },
+              {
+                label: "Contact info",
+                before: "Corrupted",
+                after: "Clean",
+              },
+            ].map((row) => (
+              <div
+                key={row.label}
+                className="grid grid-cols-2 divide-x divide-soft-gray border-t border-soft-gray"
+              >
+                <div className="bg-ash-white px-4 py-3">
+                  <p className="mb-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-echo">
+                    {row.label}
+                  </p>
+                  <p className="text-sm text-carbon-core">{row.before}</p>
+                </div>
+                <div className="bg-pure-white px-4 py-3">
+                  <p className="mb-0.5 text-[0.6875rem] font-medium uppercase tracking-wide text-echo">
+                    {row.label}
+                  </p>
+                  <p
+                    className={`text-sm font-semibold ${
+                      row.highlight ? "text-forge-red" : "text-carbon-core"
+                    }`}
+                  >
+                    {row.after}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-xs text-echo">
+            Real candidate. Real job description. No adjustments made for
+            demonstration purposes.
+          </p>
         </section>
 
         {/* ── NO FABRICATION ── */}

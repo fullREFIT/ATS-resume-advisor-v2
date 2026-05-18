@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nic's AI Resume Advisor — Honest Diagnosis, ATS-Optimized Output | Free</title>
+  <meta name="description" content="Diagnose your resume against any job description. Get an honest score, understand exactly why you're ranked low, and download an ATS-safe tailored resume. No account. No fabrication. Free." />
+  <meta property="og:title" content="Nic's AI Resume Advisor — Know Before You Apply" />
+  <meta property="og:description" content="Honest verdict. Real tailoring. No fabrication. Paste your resume and a job description — or a company URL for cold outreach. Free." />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: #0a0a0a; color: #e8e4de; overflow-x: hidden; -webkit-font-smoothing: antialiased; }
+    ::selection { background: #4ade80; color: #0a0a0a; }
+    a { text-decoration: none; }
+    img { max-width: 100%; }
+
+    /* ── tokens ── */
+    :root {
+      --green: #4ade80;
+      --green-dim: rgba(74,222,128,0.08);
+      --green-border: rgba(74,222,128,0.15);
+      --green-dark: #166534;
+      --bg-dark: #0a0a0a;
+      --bg-dark-alt: #0f0f0f;
+      --bg-light: #f5f2ed;
+      --bg-light-alt: #faf9f6;
+      --bg-light-card: #e8e5df;
+      --text-light: #e8e4de;
+      --text-muted: #a8a29e;
+      --text-dim: #78716c;
+      --text-faint: #57534e;
+      --text-dark: #1a1a1a;
+      --text-dark-body: #44403c;
+      --text-dark-sub: #57534e;
+      --border-dark: #1f1f1f;
+      --border-light: #d6d3cd;
+      --serif: 'Instrument Serif', serif;
+      --sans: 'DM Sans', sans-serif;
+      --mono: 'DM Mono', monospace;
+      --red: #991b1b;
+      --red-light: #f87171;
+      --yellow: #fbbf24;
+    }
+
+    /* ── animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(40px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes grain {
+      0%, 100% { transform: translate(0,0); }
+      10% { transform: translate(-2%,-2%); }
+      30% { transform: translate(3%,-1%); }
+      50% { transform: translate(-1%,3%); }
+      70% { transform: translate(2%,1%); }
+      90% { transform: translate(-3%,2%); }
+    }
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.7s cubic-bezier(.22,1,.36,1), transform 0.7s cubic-bezier(.22,1,.36,1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── nav ── */
+    .nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      padding: 16px 24px;
+      transition: all 0.3s ease;
+      border-bottom: 1px solid transparent;
+    }
+    .nav.scrolled {
+      background: rgba(10,10,10,0.92);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom-color: rgba(255,255,255,0.06);
+    }
+    .nav-inner {
+      max-width: 960px; margin: 0 auto;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .nav-brand {
+      font-family: var(--serif); font-size: 22px; color: var(--text-light);
+      letter-spacing: -0.02em;
+    }
+
+    /* ── buttons ── */
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 16px 32px; background: #fff; color: var(--bg-dark);
+      border: none; border-radius: 8px;
+      font-size: 16px; font-weight: 700; font-family: var(--sans);
+      cursor: pointer; transition: all 0.2s ease;
+    }
+    .btn:hover { background: var(--text-light); }
+    .btn-sm { padding: 10px 22px; font-size: 14px; border-radius: 6px; }
+    .btn-dark { background: var(--text-dark); color: #fff; }
+    .btn-dark:hover { background: #2a2a2a; }
+    .btn-ghost {
+      background: none; color: var(--text-muted); padding: 12px 0;
+      font-weight: 500; font-size: 15px;
+    }
+    .btn-ghost:hover { color: #fff; }
+
+    /* ── sections ── */
+    .section { padding: 96px 24px; }
+    .section-inner { max-width: 960px; margin: 0 auto; }
+    .section-dark { background: var(--bg-dark); color: var(--text-light); }
+    .section-dark-alt { background: var(--bg-dark-alt); color: var(--text-light); }
+    .section-light { background: var(--bg-light); color: var(--text-dark); }
+    .section-light-alt { background: var(--bg-light-alt); color: var(--text-dark); }
+
+    /* ── typography ── */
+    .label {
+      display: inline-block;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;
+      font-family: var(--mono); margin-bottom: 20px;
+    }
+    .label-dark { color: var(--text-muted); }
+    .label-light { color: var(--text-dim); }
+    .heading {
+      font-family: var(--serif);
+      font-size: clamp(32px, 5vw, 48px);
+      line-height: 1.1; letter-spacing: -0.02em;
+    }
+    .heading-lg {
+      font-size: clamp(40px, 7vw, 72px);
+      line-height: 1.05; letter-spacing: -0.03em;
+    }
+    .heading em { color: var(--green); font-style: italic; }
+
+    /* ── verdict badges ── */
+    .verdict {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 14px; border-radius: 6px;
+      font-weight: 700; font-size: 14px; letter-spacing: 0.05em;
+      font-family: var(--mono);
+    }
+    .verdict-go { background: #14532d; color: var(--green); border: 1px solid #166534; }
+    .verdict-fix { background: #713f12; color: var(--yellow); border: 1px solid #854d0e; }
+    .verdict-pass { background: #7f1d1d; color: var(--red-light); border: 1px solid var(--red); }
+    .verdict-score { opacity: 0.7; font-weight: 400; }
+
+    /* ── stat row ── */
+    .stat-row {
+      display: flex; gap: 24px; align-items: flex-start;
+      padding: 24px 0; border-bottom: 1px solid var(--border-dark);
+    }
+    .stat-num {
+      font-family: var(--serif); font-size: 48px; font-weight: 400;
+      color: var(--green); line-height: 1; min-width: 80px; text-align: right;
+      letter-spacing: -0.04em;
+    }
+
+    /* ── step row ── */
+    .step-row {
+      display: flex; gap: 28px; align-items: flex-start;
+      padding: 32px 0; border-bottom: 1px solid var(--border-light);
+    }
+    .step-num {
+      font-family: var(--mono); font-size: 14px; font-weight: 500;
+      color: var(--green-dark); min-width: 32px; padding-top: 4px;
+    }
+
+    /* ── layer card ── */
+    .layer-row {
+      display: flex; gap: 24px; align-items: flex-start;
+      padding: 28px 0; border-bottom: 1px solid var(--border-dark);
+    }
+    .layer-icon {
+      width: 48px; height: 48px; border-radius: 8px;
+      background: var(--green-dim); border: 1px solid var(--green-border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .layer-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.1em;
+      color: var(--green); font-family: var(--mono);
+    }
+
+    /* ── feature list ── */
+    .feat-item {
+      display: flex; gap: 12px; align-items: flex-start; margin-bottom: 10px;
+    }
+    .feat-arrow {
+      color: var(--green-dark); font-weight: 700; font-size: 14px;
+      font-family: var(--mono); margin-top: 2px;
+    }
+
+    /* ── tables ── */
+    .tbl { width: 100%; border-collapse: collapse; font-family: var(--sans); font-size: 14px; }
+    .tbl th {
+      text-align: left; padding: 12px 16px;
+      font-weight: 700; font-size: 12px; letter-spacing: 0.08em;
+      text-transform: uppercase; font-family: var(--mono);
+    }
+    .tbl td { padding: 14px 16px; }
+
+    .tbl-dark th { color: var(--text-dim); border-bottom: 2px solid #2a2a2a; }
+    .tbl-dark th:nth-child(2) { color: var(--green); }
+    .tbl-dark tr { border-bottom: 1px solid var(--border-dark); }
+    .tbl-dark td:first-child { font-weight: 600; color: var(--text-light); white-space: nowrap; }
+    .tbl-dark td:nth-child(2) { color: #d4d0c8; }
+    .tbl-dark td:nth-child(3) { color: var(--text-dim); }
+
+    .tbl-light th { color: var(--text-dim); border-bottom: 2px solid var(--border-light); }
+    .tbl-light th:nth-child(3) { color: var(--green-dark); }
+    .tbl-light tr { border-bottom: 1px solid #e7e5e0; }
+    .tbl-light td:first-child { font-weight: 600; white-space: nowrap; }
+    .tbl-light td:nth-child(2) { color: var(--red); }
+    .tbl-light td:nth-child(3) { color: var(--green-dark); font-weight: 600; }
+
+    /* ── faq ── */
+    .faq-item {
+      border-bottom: 1px solid #2a2a2a; padding: 20px 0; cursor: pointer;
+      user-select: none;
+    }
+    .faq-q {
+      display: flex; justify-content: space-between; align-items: center;
+      font-weight: 600; font-size: 17px; color: var(--text-light);
+    }
+    .faq-toggle {
+      font-size: 24px; color: var(--text-dim); font-weight: 300;
+      transition: transform 0.3s ease; flex-shrink: 0; margin-left: 16px;
+    }
+    .faq-item.open .faq-toggle { transform: rotate(45deg); }
+    .faq-a {
+      max-height: 0; overflow: hidden; transition: max-height 0.4s ease;
+    }
+    .faq-item.open .faq-a { max-height: 300px; }
+    .faq-a p {
+      margin-top: 12px; font-size: 15px; line-height: 1.7; color: var(--text-muted);
+    }
+
+    /* ── trust strip ── */
+    .trust-strip {
+      display: flex; justify-content: center; gap: 32px;
+      margin-top: 40px; flex-wrap: wrap;
+    }
+    .trust-item {
+      font-size: 12px; color: var(--text-faint);
+      font-family: var(--mono);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .trust-check { color: var(--green); }
+
+    /* ── responsive ── */
+    @media (max-width: 640px) {
+      .stat-row { flex-direction: column; gap: 8px; }
+      .stat-num { text-align: left; min-width: auto; font-size: 36px; }
+      .step-row { flex-direction: column; gap: 8px; }
+      .step-num { min-width: auto; }
+      .layer-row { flex-direction: column; gap: 12px; }
+      .nav-brand { font-size: 18px; }
+      .hero-ctas { flex-direction: column; align-items: center; }
+      .trust-strip { flex-direction: column; align-items: center; gap: 12px; }
+      .tbl { font-size: 13px; }
+      .tbl td, .tbl th { padding: 10px 10px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ═══ NAV ═══ -->
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <span class="nav-brand">Nic's AI Resume Advisor</span>
+      <a href="https://ats-resume-advisor-v2.vercel.app" target="_blank" rel="noopener noreferrer" class="btn btn-sm">Try it free →</a>
+    </div>
+  </nav>
+
+  <!-- ═══ HERO ═══ -->
+  <section style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 24px 96px;position:relative;overflow:hidden;background:var(--bg-dark);">
+    <!-- grain -->
+    <div style="position:absolute;inset:-50%;background:url(&quot;data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E&quot;);animation:grain 8s steps(10) infinite;pointer-events:none;z-index:1;"></div>
+    <!-- glow -->
+    <div style="position:absolute;top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(74,222,128,0.06) 0%,transparent 70%);pointer-events:none;"></div>
+
+    <div style="max-width:760px;text-align:center;position:relative;z-index:2;animation:fadeUp 1s cubic-bezier(.22,1,.36,1) forwards;">
+      <span style="display:inline-block;font-size:12px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--green);font-family:var(--mono);margin-bottom:28px;padding:6px 16px;border:1px solid rgba(74,222,128,0.2);border-radius:100px;">Free AI Resume Tool</span>
+
+      <h1 class="heading heading-lg" style="color:#fff;margin-bottom:24px;">
+        Your resume isn't getting callbacks. <em>Here's exactly why.</em>
+      </h1>
+
+      <p style="font-size:clamp(16px,2.2vw,20px);line-height:1.65;color:var(--text-muted);max-width:580px;margin:0 auto 40px;">
+        Paste your resume and a job description. Get an honest match score, understand what's working against you, and download an ATS-safe tailored resume — built from your actual experience, nothing invented.
+      </p>
+
+      <div class="hero-ctas" style="display:flex;gap:24px;justify-content:center;align-items:center;flex-wrap:wrap;">
+        <a href="https://ats-resume-advisor-v2.vercel.app" target="_blank" rel="noopener noreferrer" class="btn">Try it free — no account needed →</a>
+        <a href="#how-it-works" class="btn btn-ghost">How it works ↓</a>
+      </div>
+
+      <p style="margin-top:32px;font-size:13px;color:var(--text-faint);font-family:var(--mono);">
+        No signup · No API key · Your data stays in your browser
+      </p>
+    </div>
+  </section>
+
+  <!-- ═══ VERDICT STRIP ═══ -->
+  <section style="background:var(--bg-dark-alt);border-top:1px solid var(--border-dark);border-bottom:1px solid var(--border-dark);padding:28px 24px;display:flex;justify-content:center;align-items:center;gap:16px;flex-wrap:wrap;">
+    <span style="color:var(--text-dim);font-size:14px;">Real verdicts:</span>
+    <span class="verdict verdict-go">GO <span class="verdict-score">72/100</span></span>
+    <span class="verdict verdict-fix">FIX FIRST <span class="verdict-score">58/100</span></span>
+    <span class="verdict verdict-pass">PASS <span class="verdict-score">34/100</span></span>
+  </section>
+
+  <!-- ═══ PROBLEM ═══ -->
+  <section class="section section-dark" id="problem">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="label label-dark">The real problem</span>
+        <h2 class="heading" style="color:#fff;margin-bottom:32px;">Most resume tools are lying to you.</h2>
+      </div>
+      <div class="reveal" style="transition-delay:0.1s;">
+        <p style="font-size:17px;line-height:1.75;color:var(--text-muted);margin-bottom:32px;">
+          They give you a keyword score and tell you to optimize. They stuff your resume with phrases. They tell you everything looks great — because that's what keeps your subscription.
+        </p>
+        <p style="font-size:15px;font-weight:600;color:var(--text-light);margin-bottom:20px;letter-spacing:0.02em;">Here's what they don't tell you:</p>
+      </div>
+
+      <div class="reveal stat-row" style="border-top:1px solid var(--border-dark);transition-delay:0.15s;">
+        <span class="stat-num">92%</span>
+        <p style="font-size:15px;line-height:1.7;color:var(--text-muted);">of applicant tracking systems don't auto-reject based on content. The myth of the ATS rejection wall is wrong. The real problem is being ranked so low that no recruiter ever sees you.</p>
+      </div>
+      <div class="reveal stat-row" style="transition-delay:0.2s;">
+        <span class="stat-num">30%</span>
+        <p style="font-size:15px;line-height:1.7;color:var(--text-muted);">of low rankings are caused by parsing failure. Multi-column resumes, tables, text boxes, and PDF exports from Canva or Figma are destroying your ATS score before a human reads a single word.</p>
+      </div>
+      <div class="reveal stat-row" style="transition-delay:0.25s;">
+        <span class="stat-num">0</span>
+        <p style="font-size:15px;line-height:1.7;color:var(--text-muted);">tools will tell you to pass on a role. The gap between your resume and this job might actually be disqualifying. You deserve to know that before you spend two hours tailoring.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ HOW IT WORKS ═══ -->
+  <section class="section section-light" id="how-it-works">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="label label-light">How it works</span>
+        <h2 class="heading" style="margin-bottom:56px;">Four steps. One honest answer.</h2>
+      </div>
+
+      <div class="reveal step-row" style="transition-delay:0.05s;">
+        <span class="step-num">01</span>
+        <div>
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:8px;">Paste your resume + job description</h3>
+          <p style="font-size:15px;line-height:1.7;color:var(--text-dark-sub);">Upload a PDF or .docx, or paste plain text. Paste the full job description. Takes 60 seconds.</p>
+        </div>
+      </div>
+      <div class="reveal step-row" style="transition-delay:0.1s;">
+        <span class="step-num">02</span>
+        <div>
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:8px;">Get your diagnosis</h3>
+          <p style="font-size:15px;line-height:1.7;color:var(--text-dark-sub);">A match score from 0–100, broken down across four real dimensions: keyword match, experience relevance, trajectory fit, and ATS parsing quality. A verdict — GO, FIX FIRST, or PASS — with a plain-English explanation of what drove it.</p>
+        </div>
+      </div>
+      <div class="reveal step-row" style="transition-delay:0.15s;">
+        <span class="step-num">03</span>
+        <div>
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:8px;">Answer five targeted questions</h3>
+          <p style="font-size:15px;line-height:1.7;color:var(--text-dark-sub);">Not generic. Five questions specific to your resume and this job — designed to surface the STAR stories, quantified outcomes, and demonstrated evidence you have but didn't write down.</p>
+        </div>
+      </div>
+      <div class="reveal step-row" style="transition-delay:0.2s;">
+        <span class="step-num">04</span>
+        <div>
+          <h3 style="font-size:20px;font-weight:700;margin-bottom:8px;">Download your tailored resume</h3>
+          <p style="font-size:15px;line-height:1.7;color:var(--text-dark-sub);">Your experience rewritten using exact language from the job description — your evidence, never invented. Every role preserved. An ATS-safe Word document ready to submit.</p>
+        </div>
+      </div>
+
+      <div class="reveal" style="transition-delay:0.25s;margin-top:40px;padding:24px 28px;background:var(--bg-light-card);border-radius:8px;border-left:3px solid var(--green-dark);">
+        <p style="font-size:15px;line-height:1.7;color:var(--text-dark-body);">
+          <strong style="color:var(--text-dark);">Bonus — Interview prep.</strong> Likely questions, STAR stories to prepare, and suggested responses for the weak spots the model found.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ NO FABRICATION ═══ -->
+  <section class="section section-dark">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="label label-dark">The no-fabrication promise</span>
+        <h2 class="heading" style="color:#fff;margin-bottom:20px;">Every bullet is fact-checked. <em>Twice.</em></h2>
+      </div>
+      <div class="reveal" style="transition-delay:0.1s;">
+        <p style="font-size:17px;line-height:1.75;color:var(--text-muted);margin-bottom:48px;">
+          Most AI writing tools generate plausible-sounding content. That's a problem when the content is your resume — because recruiters and hiring managers spot invented experience. A fabricated bullet that gets caught is worse than the original.
+        </p>
+      </div>
+
+      <div class="reveal layer-row" style="transition-delay:0.15s;">
+        <div class="layer-icon">⛔</div>
+        <div>
+          <span class="layer-label">Layer 1</span>
+          <h3 style="font-size:18px;font-weight:700;color:var(--text-light);margin:6px 0 8px;">The system prompt forbids it</h3>
+          <p style="font-size:15px;line-height:1.7;color:var(--text-muted);">The model is explicitly instructed to use only what you provided. No inventing tools, metrics, outcomes, or roles.</p>
+        </div>
+      </div>
+      <div class="reveal layer-row" style="transition-delay:0.2s;">
+        <div class="layer-icon">🎯</div>
+        <div>
+          <span class="layer-label">Layer 2</span>
+          <h3 style="font-size:18px;font-weight:700;color:var(--text-light);margin:6px 0 8px;">The intake forces real evidence in</h3>
+          <p style="font-size:15px;line-height:1.7;color:var(--text-muted);">Before tailoring runs, five targeted questions surface specific stories and outcomes from your actual background. The model rewrites from that evidence — not from inference.</p>
+        </div>
+      </div>
+      <div class="reveal layer-row" style="transition-delay:0.25s;">
+        <div class="layer-icon">✓</div>
+        <div>
+          <span class="layer-label">Layer 3</span>
+          <h3 style="font-size:18px;font-weight:700;color:var(--text-light);margin:6px 0 8px;">A second AI call reviews every bullet</h3>
+          <p style="font-size:15px;line-height:1.7;color:var(--text-muted);">After the resume is generated, a separate fact-check call compares every rewritten bullet against your original resume and intake answers. Anything not supported gets flagged and regenerated.</p>
+        </div>
+      </div>
+
+      <div class="reveal" style="transition-delay:0.3s;">
+        <p style="margin-top:32px;font-size:17px;line-height:1.7;color:var(--text-light);font-weight:500;font-family:var(--serif);font-style:italic;">
+          The result is a resume that's polished and targeted — and one you can actually stand behind.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ COMPANY MODE ═══ -->
+  <section class="section section-light">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="label label-light">Not just for active job seekers</span>
+        <h2 class="heading" style="font-size:clamp(28px,4.5vw,44px);margin-bottom:24px;">Want to get in front of a company before a role is posted?</h2>
+      </div>
+      <div class="reveal" style="transition-delay:0.1s;">
+        <p style="font-size:17px;line-height:1.75;color:var(--text-dark-sub);margin-bottom:36px;">
+          Most people wait for job listings. The candidates who get hired at companies they actually want to work for don't. If there's a specific company on your list — a former client, a dream employer, a startup you've followed — this tool can read their website and help you position your background for a cold outreach that has a real reason to exist.
+        </p>
+      </div>
+      <div class="reveal" style="transition-delay:0.15s;">
+        <div style="background:var(--bg-light-card);border-radius:10px;padding:32px;margin-bottom:36px;">
+          <p style="font-size:15px;font-weight:600;color:var(--text-dark);margin-bottom:16px;">Paste a company URL. The tool:</p>
+          <div class="feat-item"><span class="feat-arrow">→</span><span style="font-size:15px;line-height:1.6;color:var(--text-dark-body);">Reads what the company does and what it appears to value</span></div>
+          <div class="feat-item"><span class="feat-arrow">→</span><span style="font-size:15px;line-height:1.6;color:var(--text-dark-body);">Maps where your background aligns</span></div>
+          <div class="feat-item"><span class="feat-arrow">→</span><span style="font-size:15px;line-height:1.6;color:var(--text-dark-body);">Names the gaps that would weaken your pitch</span></div>
+          <div class="feat-item"><span class="feat-arrow">→</span><span style="font-size:15px;line-height:1.6;color:var(--text-dark-body);">Asks five intake questions specific to cold outreach</span></div>
+          <div class="feat-item"><span class="feat-arrow">→</span><span style="font-size:15px;line-height:1.6;color:var(--text-dark-body);">Produces a tailored resume, a positioning angle, and a draft message</span></div>
+          <p style="font-size:14px;color:var(--text-dim);margin-top:16px;font-style:italic;">Everything grounded in what the company actually said about themselves. No invented company facts.</p>
+        </div>
+      </div>
+      <div class="reveal" style="transition-delay:0.2s;">
+        <a href="https://ats-resume-advisor-v2.vercel.app" target="_blank" rel="noopener noreferrer" class="btn btn-dark">Try the company-targeting mode →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ BEFORE / AFTER ═══ -->
+  <section class="section section-light-alt">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="label label-light">What it produces</span>
+        <h2 class="heading" style="font-size:clamp(28px,4.5vw,44px);margin-bottom:16px;">Real tailoring. Not a rewrite of your weakest version.</h2>
+      </div>
+      <div class="reveal" style="transition-delay:0.1s;">
+        <p style="font-size:15px;line-height:1.7;color:var(--text-dark-sub);margin-bottom:8px;">
+          We ran this tool against a real candidate — Nic, a sales leader applying for a Sales Manager role — using his current resume and the job description. Here's what changed:
+        </p>
+        <div style="overflow-x:auto;margin:32px 0 0;">
+          <table class="tbl tbl-light">
+            <thead><tr><th></th><th>Before</th><th>After</th></tr></thead>
+            <tbody>
+              <tr><td>Match score</td><td>62/100 — FIX FIRST</td><td>72/100 — GO</td></tr>
+              <tr><td>Score breakdown</td><td>2-sentence summary</td><td>4 components with individual scores</td></tr>
+              <tr><td>Roles in output</td><td>Flat bullet list (0 roles)</td><td>4 full role entries</td></tr>
+              <tr><td>Total bullets</td><td>7</td><td>17</td></tr>
+              <tr><td>Exact JD phrases</td><td>~5 (paraphrased)</td><td>13 verbatim</td></tr>
+              <tr><td>Missed keywords</td><td>Not disclosed</td><td>1, with explicit reason</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p style="margin-top:24px;font-size:14px;line-height:1.65;color:var(--text-dim);font-family:var(--mono);">
+          The .docx downloaded from Nic's AI Resume Advisor is single-column, Calibri 11pt, no tables or graphics — the format every ATS parses cleanly.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ COMPARISON ═══ -->
+  <section class="section section-dark">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="label label-dark">How it's different</span>
+        <h2 class="heading" style="color:#fff;margin-bottom:20px;">Not another keyword score. <em>An actual verdict.</em></h2>
+      </div>
+      <div class="reveal" style="transition-delay:0.1s;">
+        <p style="font-size:17px;line-height:1.75;color:var(--text-muted);margin-bottom:12px;">
+          Keyword-match tools show you a percentage and tell you to optimize. They don't tell you if the gap is real. They don't tell you your format is destroying your ranking. They don't tell you to pass on a role.
+        </p>
+        <p style="font-size:17px;line-height:1.75;color:var(--text-light);font-weight:500;margin-bottom:8px;">This tool does.</p>
+        <div style="overflow-x:auto;margin:40px 0 0;">
+          <table class="tbl tbl-dark">
+            <thead><tr><th></th><th>Nic's AI Resume Advisor</th><th>Other tools</th></tr></thead>
+            <tbody>
+              <tr><td>Honest verdict</td><td>Will tell you not to apply</td><td>Shows score, optimizes regardless</td></tr>
+              <tr><td>No fabrication</td><td>Three-layer enforcement</td><td>No enforcement</td></tr>
+              <tr><td>Structure preserved</td><td>Every role intact with dates</td><td>Often flattens to bullet list</td></tr>
+              <tr><td>ATS-safe export</td><td>.docx, proven format</td><td>No or inconsistent</td></tr>
+              <tr><td>Cold outreach mode</td><td>Company-targeting flow</td><td>Not available</td></tr>
+              <tr><td>Targeted intake</td><td>5 questions specific to your gaps</td><td>Generic or none</td></tr>
+              <tr><td>Interview prep</td><td>Per-role STAR stories</td><td>Generic or none</td></tr>
+              <tr><td>Cost</td><td>Free</td><td>$9–$40/mo subscription</td></tr>
+              <tr><td>Account required</td><td>No</td><td>Yes</td></tr>
+              <tr><td>Data retention</td><td>None — localStorage only</td><td>Yes — server-stored</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FAQ ═══ -->
+  <section class="section section-dark-alt" id="faq">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="label label-dark">Questions</span>
+        <h2 class="heading" style="color:#fff;font-size:clamp(28px,4.5vw,40px);margin-bottom:8px;">What you're wondering.</h2>
+      </div>
+      <div id="faq-list" style="margin-top:40px;">
+        <!-- populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FINAL CTA ═══ -->
+  <section class="section section-dark" style="text-align:center;position:relative;border-top:1px solid var(--border-dark);">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:500px;height:500px;background:radial-gradient(circle,rgba(74,222,128,0.05) 0%,transparent 70%);pointer-events:none;"></div>
+    <div style="max-width:600px;margin:0 auto;position:relative;z-index:2;">
+      <div class="reveal">
+        <h2 class="heading" style="color:#fff;font-size:clamp(32px,5.5vw,52px);letter-spacing:-0.03em;margin-bottom:20px;">Your next application should start here.</h2>
+      </div>
+      <div class="reveal" style="transition-delay:0.1s;">
+        <p style="font-size:17px;line-height:1.7;color:var(--text-muted);margin-bottom:36px;">Know your odds. Understand the gap. Download a resume you can submit with confidence.</p>
+      </div>
+      <div class="reveal" style="transition-delay:0.15s;">
+        <a href="https://ats-resume-advisor-v2.vercel.app" target="_blank" rel="noopener noreferrer" class="btn">Try it free →</a>
+        <p style="margin-top:20px;font-size:13px;color:var(--text-faint);font-family:var(--mono);">Takes about 10 minutes end to end.</p>
+      </div>
+      <div class="reveal trust-strip" style="transition-delay:0.2s;">
+        <span class="trust-item"><span class="trust-check">✓</span> No account required</span>
+        <span class="trust-item"><span class="trust-check">✓</span> No data stored on our servers</span>
+        <span class="trust-item"><span class="trust-check">✓</span> Built with Claude (Anthropic)</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ FOOTER ═══ -->
+  <footer style="background:#050505;border-top:1px solid var(--border-dark);padding:40px 24px;text-align:center;">
+    <p style="font-size:14px;color:var(--text-faint);line-height:1.7;">
+      Built by <a href="https://fullrefit.com" target="_blank" rel="noopener noreferrer" style="color:var(--text-muted);text-decoration:underline;text-underline-offset:3px;">full/REFIT</a>
+    </p>
+    <p style="font-size:13px;color:#3f3f3f;margin-top:8px;max-width:480px;margin-left:auto;margin-right:auto;line-height:1.6;">
+      We build operational AI systems and equip teams to use them. If a free tool can solve a problem this specific, imagine what a custom system inside your organization could do.
+    </p>
+    <a href="https://fullrefit.com" target="_blank" rel="noopener noreferrer" style="display:inline-block;margin-top:16px;font-size:13px;color:var(--text-dim);font-family:var(--mono);">
+      See what we build at fullrefit.com →
+    </a>
+  </footer>
+
+  <script>
+    // ── scroll-reveal ──
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+    // ── nav scroll ──
+    window.addEventListener('scroll', () => {
+      document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 50);
+    }, { passive: true });
+
+    // ── FAQ ──
+    const faqs = [
+      { q: "Is this actually free?", a: "Yes. No account, no credit card, no API key required. The tool is free to use." },
+      { q: "Where does my resume go?", a: "Your resume text is sent to our API routes for processing (which call Anthropic's Claude models) and then returned to your browser. Nothing is stored on a server. Your session state lives only in your browser's localStorage." },
+      { q: "What formats can I upload?", a: ".pdf and .docx. You can also paste plain text directly. If you're on a Mac and your resume is in Apple Pages, export it to PDF first (File → Export To → PDF)." },
+      { q: "Can the AI tell when my resume won't parse correctly?", a: "Yes — the ATS parsing component scores how cleanly your resume reads in plain text. Multi-column layouts, tables, text boxes, and image-based PDFs all get flagged. The downloaded .docx is deliberately plain to fix this." },
+      { q: "What if I don't have a job description?", a: "Use company-targeting mode. Paste the company's website URL instead. The tool reads what the company does and helps you position yourself for cold outreach — even without a specific role to match against." },
+      { q: "What if the tool says to pass on a role I really want?", a: "That's the most valuable output this tool produces. A PASS verdict means the gap is significant enough that an honest ranking system will bury your application. Your options: close the gap first, or apply anyway knowing you're starting at a disadvantage. Either way, you're making an informed decision." },
+      { q: "Does it work for senior roles?", a: "Yes. Tested with sales leadership, operations, and strategy roles. The output respects the candidate's level — it doesn't flatten a 15-year career into entry-level language." },
+    ];
+
+    const faqList = document.getElementById('faq-list');
+    faqs.forEach((f, i) => {
+      const div = document.createElement('div');
+      div.className = 'faq-item';
+      div.innerHTML = `
+        <div class="faq-q">${f.q}<span class="faq-toggle">+</span></div>
+        <div class="faq-a"><p>${f.a}</p></div>
+      `;
+      div.addEventListener('click', () => {
+        const wasOpen = div.classList.contains('open');
+        faqList.querySelectorAll('.faq-item.open').forEach(el => el.classList.remove('open'));
+        if (!wasOpen) div.classList.add('open');
+      });
+      faqList.appendChild(div);
+    });
+  </script>
+</body>
+</html>

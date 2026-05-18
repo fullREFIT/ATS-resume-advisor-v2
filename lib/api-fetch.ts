@@ -26,13 +26,25 @@ function urlFor(endpoint: Endpoint): string {
   return `/api/demo/${endpoint}`;
 }
 
+function getBypassToken(): string | null {
+  try {
+    return localStorage.getItem("nars_bypass_token");
+  } catch {
+    return null;
+  }
+}
+
 export async function callApi<TBody, TResp>({
   endpoint,
   body,
 }: CallApiArgs<TBody>): Promise<TResp> {
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  const bypass = getBypassToken();
+  if (bypass) headers["x-bypass-token"] = bypass;
+
   const res = await fetch(urlFor(endpoint), {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers,
     body: JSON.stringify(body),
   });
   const data = (await res.json()) as TResp & { error?: string };
