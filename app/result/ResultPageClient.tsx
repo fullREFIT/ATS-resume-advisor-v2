@@ -7,12 +7,15 @@ import { CopyButton } from "@/components/CopyButton";
 import { InfoBlock } from "@/components/ui/InfoBlock";
 import { InterviewPrep } from "@/components/InterviewPrep";
 import { TailoredExperience } from "@/components/TailoredBullets";
-import { clearSession, loadSession } from "@/lib/storage";
+import { clearSession, loadSession, saveSession } from "@/lib/storage";
+import { TargetPersonsPanel } from "@/components/TargetPersonsPanel";
 import type {
   CompanyTailoredOutput,
   IntakeMode,
   SessionState,
   TailoredOutput,
+  TargetPersonArchetype,
+  TargetPersonsResponse,
 } from "@/lib/types";
 
 export function ResultPageClient() {
@@ -21,6 +24,8 @@ export function ResultPageClient() {
   const [tailored, setTailored] = useState<TailoredOutput | null>(null);
   const [companyTailored, setCompanyTailored] =
     useState<CompanyTailoredOutput | null>(null);
+  const [targetPersons, setTargetPersons] =
+    useState<TargetPersonsResponse | null>(null);
   const [session, setSession] = useState<SessionState | null>(null);
 
   useEffect(() => {
@@ -32,6 +37,7 @@ export function ResultPageClient() {
       }
       setMode("company");
       setCompanyTailored(s.companyTailored);
+      setTargetPersons(s.targetPersons ?? null);
     } else {
       if (!s.tailored) {
         router.replace("/start");
@@ -48,6 +54,37 @@ export function ResultPageClient() {
     router.push("/start");
   }
 
+  async function fetchTargetPersons() {
+    if (!companyTailored) throw new Error("Company-mode output is not ready.");
+    const s = loadSession();
+    if (!s.companyContent || !s.companyFit) {
+      throw new Error("Company analysis is not available.");
+    }
+
+    const res = await fetch("/api/demo/target-persons", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        resume: s.resume,
+        companyContent: s.companyContent.text,
+        companyName: s.companyFit.companyName,
+        valuesObserved: s.companyFit.valuesObserved,
+        positioning: companyTailored.coldOutreachAngle.positioning,
+        draftMessage: companyTailored.coldOutreachAngle.draftMessage,
+        companyHooksUsed: companyTailored.companyHooksUsed,
+      }),
+    });
+
+    if (!res.ok) {
+      const body = await res.json().catch(() => ({})) as { error?: string };
+      throw new Error(body.error ?? `Request failed (${res.status}).`);
+    }
+    const data = (await res.json()) as { archetypes: TargetPersonArchetype[] };
+    const persisted: TargetPersonsResponse = { archetypes: data.archetypes };
+    setTargetPersons(persisted);
+    saveSession({ ...s, targetPersons: persisted, updatedAt: Date.now() });
+  }
+
   if (!session) {
     return <p className="text-sm text-echo">Loading your result…</p>;
   }
@@ -55,6 +92,8 @@ export function ResultPageClient() {
     return (
       <CompanyResultView
         tailored={companyTailored}
+        targetPersons={targetPersons}
+        onFetchTargetPersons={fetchTargetPersons}
         onStartOver={onStartOver}
       />
     );
@@ -190,9 +229,13 @@ function RoleResultView({
 
 function CompanyResultView({
   tailored,
+  targetPersons,
+  onFetchTargetPersons,
   onStartOver,
 }: {
   tailored: CompanyTailoredOutput;
+  targetPersons: TargetPersonsResponse | null;
+  onFetchTargetPersons: () => Promise<void>;
   onStartOver: () => void;
 }) {
   const contactLine = [
@@ -251,6 +294,11 @@ function CompanyResultView({
           </p>
         </section>
       )}
+
+      <TargetPersonsPanel
+        archetypes={targetPersons?.archetypes ?? null}
+        onFetch={onFetchTargetPersons}
+      />
 
       <section className="card-surface flex flex-col gap-1">
         <p className="section-label mb-1">Contact</p>
