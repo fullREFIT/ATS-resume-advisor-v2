@@ -17,7 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Nic's AI Resume Advisor — Honest Diagnosis, ATS-Optimized Output",
+  title: "Resume Verdict — Honest Diagnosis, ATS-Optimized Output",
   description:
     "Diagnose your resume against any job description. Honest verdict, no fabrication, ATS-safe tailoring. Free.",
 };

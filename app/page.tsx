@@ -18,14 +18,15 @@ const mono = DM_Mono({
 });
 
 export const metadata = {
-  title: "Nic's AI Resume Advisor — Honest Diagnosis, ATS-Optimized Output | Free",
+  title: "Resume Verdict — Honest Diagnosis, ATS-Optimized Output | Free",
   description:
     "Diagnose your resume against any job description. Get an honest score, understand exactly why you're ranked low, and download an ATS-safe tailored resume. No account. No fabrication. Free.",
   openGraph: {
-    title: "Nic's AI Resume Advisor — Know Before You Apply",
+    title: "Resume Verdict — Know Before You Apply",
     description:
       "Honest verdict. Real tailoring. No fabrication. Paste your resume and a job description — or a company URL for cold outreach. Free.",
     type: "website",
+    url: "https://resumeverdict.app",
   },
 };
 
@@ -453,8 +454,8 @@ export default function LandingPage() {
           </div>
           <div className="reveal" style={{ transitionDelay: "0.1s" }}>
             <p style={{ fontSize: 15, lineHeight: 1.7, color: T.darkSub, marginBottom: 8 }}>
-              We ran this tool against a real candidate — Nic, a sales leader applying
-              for a Sales Manager role — using his current resume and the job
+              We ran this tool against a real candidate — a sales leader applying
+              for a Sales Manager role — using their current resume and the job
               description. Here&apos;s what changed:
             </p>
             <div style={{ overflowX: "auto", margin: "32px 0 0" }}>
@@ -485,7 +486,7 @@ export default function LandingPage() {
               </table>
             </div>
             <p style={{ marginTop: 24, fontSize: 14, lineHeight: 1.65, color: T.dim, ...ls("mono") }}>
-              The .docx downloaded from Nic&apos;s AI Resume Advisor is single-column, Calibri 11pt, no tables or graphics — the format every ATS parses cleanly.
+              The .docx downloaded from Resume Verdict is single-column, Calibri 11pt, no tables or graphics — the format every ATS parses cleanly.
             </p>
           </div>
         </div>
@@ -516,7 +517,7 @@ export default function LandingPage() {
                 <thead>
                   <tr>
                     <th style={{ textAlign: "left", padding: "12px 16px", fontWeight: 700, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", ...ls("mono"), color: T.dim, borderBottom: `2px solid #2a2a2a` }} />
-                    <th style={{ textAlign: "left", padding: "12px 16px", fontWeight: 700, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", ...ls("mono"), color: T.green, borderBottom: `2px solid #2a2a2a` }}>Nic&apos;s AI Resume Advisor</th>
+                    <th style={{ textAlign: "left", padding: "12px 16px", fontWeight: 700, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", ...ls("mono"), color: T.green, borderBottom: `2px solid #2a2a2a` }}>Resume Verdict</th>
                     <th style={{ textAlign: "left", padding: "12px 16px", fontWeight: 700, fontSize: 12, letterSpacing: "0.08em", textTransform: "uppercase", ...ls("mono"), color: T.dim, borderBottom: `2px solid #2a2a2a` }}>Other tools</th>
                   </tr>
                 </thead>

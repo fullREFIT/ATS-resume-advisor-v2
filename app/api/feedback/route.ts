@@ -38,7 +38,7 @@ export async function POST(req: Request) {
   });
 
   const text = [
-    `🐛 *Bug Report — Nic's AI Resume Advisor*`,
+    `🐛 *Bug Report — Resume Verdict*`,
     `*Time:* ${now}`,
     `*Page:* ${body.page ?? "unknown"}`,
     `*Browser:* ${body.browserInfo ?? "unknown"} · ${body.viewport ?? "unknown"}`,

@@ -3,7 +3,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 
 export const metadata = {
-  title: "How it works — Nic's AI Resume Advisor",
+  title: "How it works — Resume Verdict",
   description:
     "Honest diagnosis. Real tailoring. No fabrication. How modern ATS actually works and how this tool addresses it.",
 };

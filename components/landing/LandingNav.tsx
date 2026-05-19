@@ -26,7 +26,7 @@ export function LandingNav() {
           className="text-[22px] tracking-[-0.02em] text-[#e8e4de]"
           style={{ fontFamily: "var(--ls-serif), serif" }}
         >
-          Nic&apos;s AI Resume Advisor
+          Resume Verdict
         </Link>
         <Link
           href="/start"

@@ -2,8 +2,8 @@
 
 import { EMPTY_SESSION, type SessionState } from "./types";
 
-const KEY = "ai-resume-advisor-v3";
-const OLD_KEYS = ["ai-resume-advisor-v2", "ai-resume-advisor-v1"];
+const KEY = "resume-verdict-v1";
+const OLD_KEYS = ["ai-resume-advisor-v3", "ai-resume-advisor-v2", "ai-resume-advisor-v1"];
 
 function isBrowser() {
   return typeof window !== "undefined" && typeof window.localStorage !== "undefined";

@@ -4,7 +4,7 @@ import { ProgressBar } from "@/components/ProgressBar";
 import { IntakeForm } from "@/components/IntakeForm";
 
 export const metadata = {
-  title: "Start — Nic's AI Resume Advisor",
+  title: "Start — Resume Verdict",
   description:
     "Paste your resume and a job description, or a company URL for cold outreach. Get an honest diagnosis and ATS-optimized tailored output.",
 };

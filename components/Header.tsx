@@ -6,7 +6,7 @@ export function Header() {
       <div className="mx-auto flex max-w-[720px] items-center justify-between gap-3 px-4 py-4 sm:px-6">
         <Link href="/" className="flex flex-col">
           <span className="text-base font-semibold tracking-tight text-carbon-core sm:text-lg">
-            Nic&apos;s AI Resume Advisor
+            Resume Verdict
           </span>
           <span className="hidden text-[0.75rem] text-echo sm:block">
             Honest diagnosis. No fabrication. ATS-optimized.

@@ -105,7 +105,7 @@ export async function fetchCompany(rawUrl: string): Promise<FetchCompanyResult> 
     res = await fetch(key, {
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (compatible; AIResumeAdvisor/1.0; +https://ats-resume-advisor.vercel.app)",
+          "Mozilla/5.0 (compatible; ResumeVerdict/1.0; +https://resumeverdict.app)",
         Accept: "text/html,application/xhtml+xml",
       },
       redirect: "follow",
