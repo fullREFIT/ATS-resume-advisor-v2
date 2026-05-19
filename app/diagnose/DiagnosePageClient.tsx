@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { DiagnosisCard } from "@/components/DiagnosisCard";
 import { CompanyFitCard } from "@/components/CompanyFitCard";
 import { GapCloser } from "@/components/GapCloser";
+import { ScoreReport } from "@/components/ScoreReport";
 import { Button } from "@/components/ui/Button";
 import { callApi } from "@/lib/api-fetch";
 import { clearSession, loadSession, patchSession } from "@/lib/storage";
@@ -128,6 +129,7 @@ export function DiagnosePageClient() {
       </div>
 
       {mode === "role" && diagnosis && <DiagnosisCard diagnosis={diagnosis} />}
+      {mode === "role" && diagnosis && <ScoreReport diagnosis={diagnosis} />}
       {mode === "role" && diagnosis && (
         <GapCloser
           verdict={diagnosis.verdict}
