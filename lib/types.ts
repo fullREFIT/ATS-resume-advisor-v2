@@ -146,6 +146,13 @@ export interface SessionState {
   updatedAt: number;
 }
 
+// T4 — Cover Letter Generator
+export interface CoverLetterOutput {
+  coverLetter: string;
+  keyEvidence: string[];
+  toneCheck: string;
+}
+
 // T2 — Gap Closer Action Plan
 export interface GapCloserAction {
   action: string;

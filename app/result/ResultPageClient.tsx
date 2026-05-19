@@ -8,6 +8,7 @@ import { InfoBlock } from "@/components/ui/InfoBlock";
 import { InterviewPrep } from "@/components/InterviewPrep";
 import { TailoredExperience } from "@/components/TailoredBullets";
 import { RecruiterScanSection } from "@/components/RecruiterScan";
+import { CoverLetterSection } from "@/components/CoverLetter";
 import { clearSession, loadSession, saveSession } from "@/lib/storage";
 import { TargetPersonsPanel } from "@/components/TargetPersonsPanel";
 import type {
@@ -118,6 +119,13 @@ export function ResultPageClient() {
   if (!session) {
     return <p className="text-sm text-echo">Loading your result…</p>;
   }
+
+  // Build intake answers array from session
+  const intakeAnswers = (session.questions?.questions ?? []).map((q) => ({
+    question: q.question,
+    answer: session.answers[q.id] ?? "",
+  }));
+
   if (mode === "company" && companyTailored) {
     return (
       <CompanyResultView
@@ -125,11 +133,23 @@ export function ResultPageClient() {
         targetPersons={targetPersons}
         onFetchTargetPersons={fetchTargetPersons}
         onStartOver={onStartOver}
+        resume={session.resume}
+        companyContent={session.companyContent?.text ?? ""}
+        companyUrl={session.companyUrl}
+        intakeAnswers={intakeAnswers}
       />
     );
   }
   if (mode === "role" && tailored) {
-    return <RoleResultView tailored={tailored} onStartOver={onStartOver} />;
+    return (
+      <RoleResultView
+        tailored={tailored}
+        onStartOver={onStartOver}
+        resume={session.resume}
+        jd={session.jd}
+        intakeAnswers={intakeAnswers}
+      />
+    );
   }
   return <p className="text-sm text-echo">Loading your result…</p>;
 }
@@ -137,9 +157,15 @@ export function ResultPageClient() {
 function RoleResultView({
   tailored,
   onStartOver,
+  resume,
+  jd,
+  intakeAnswers,
 }: {
   tailored: TailoredOutput;
   onStartOver: () => void;
+  resume: string;
+  jd: string;
+  intakeAnswers: { question: string; answer: string }[];
 }) {
   const resumeText = buildPlainTextResume(tailored);
   const contactLine = [
@@ -236,6 +262,13 @@ function RoleResultView({
         </section>
       )}
 
+      <CoverLetterSection
+        mode="role"
+        resume={resume}
+        jd={jd}
+        intakeAnswers={intakeAnswers}
+      />
+
       <section className="flex flex-col gap-3">
         <p className="section-label">Interview prep</p>
         <InterviewPrep prep={tailored.interviewPrep} />
@@ -265,11 +298,19 @@ function CompanyResultView({
   targetPersons,
   onFetchTargetPersons,
   onStartOver,
+  resume,
+  companyContent,
+  companyUrl,
+  intakeAnswers,
 }: {
   tailored: CompanyTailoredOutput;
   targetPersons: TargetPersonsResponse | null;
   onFetchTargetPersons: () => Promise<void>;
   onStartOver: () => void;
+  resume: string;
+  companyContent: string;
+  companyUrl: string;
+  intakeAnswers: { question: string; answer: string }[];
 }) {
   const resumeText = buildPlainTextResume(tailored);
   const contactLine = [
@@ -370,6 +411,14 @@ function CompanyResultView({
         <p className="section-label">If they reply, prep for these</p>
         <InterviewPrep prep={tailored.interviewPrep} />
       </section>
+
+      <CoverLetterSection
+        mode="company"
+        resume={resume}
+        companyContent={companyContent}
+        companyUrl={companyUrl}
+        intakeAnswers={intakeAnswers}
+      />
 
       <RecruiterScanSection resumeText={resumeText} />
 

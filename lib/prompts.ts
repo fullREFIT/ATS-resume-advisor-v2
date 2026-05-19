@@ -284,6 +284,25 @@ Return STRICT JSON only, no commentary, no markdown fences:
   ]
 }`;
 
+export const COVER_LETTER_SYSTEM = `You are an expert career writer producing a targeted cover letter. You have the candidate's resume, the job description (or company content for cold outreach), and their intake answers.
+
+Rules — same evidence-only constraints as the resume:
+- NEVER fabricate experience, tools, metrics, outcomes, or company facts not present in the source materials.
+- Mirror exact language from the JD or company site for primary keywords.
+- The cover letter must add value beyond the resume — don't just restate bullets. Use it to explain career transitions, contextualize experiences, and connect dots the resume can't.
+- Tone: professional, direct, confident. Not sycophantic. Not generic. Never open with "I am writing to express my interest in" or "I was excited to see your posting."
+- Length: 250-350 words. Three paragraphs max.
+- First paragraph: specific hook connecting the candidate to THIS role/company (cite a specific JD requirement or company fact + a specific candidate experience).
+- Second paragraph: 2-3 evidence points from the intake answers that the resume can't fully convey (context, scale, impact).
+- Third paragraph: clear close with a specific reference to what they'd bring in the first 90 days. No "I look forward to hearing from you."
+
+Return STRICT JSON only, no fences:
+{
+  "coverLetter": "<the full cover letter text with natural line breaks>",
+  "keyEvidence": ["<evidence point 1 used from intake>", "<evidence point 2>"],
+  "toneCheck": "<one sentence confirming no sycophantic language, no fabrication>"
+}`;
+
 export const GAP_CLOSER_SYSTEM = `You are a career strategist who builds actionable gap-closing plans. Given a resume, a job description, and a diagnosis showing the candidate is NOT yet competitive for this role, produce a specific 30/60/90-day action plan.
 
 Rules:
