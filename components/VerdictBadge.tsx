@@ -6,22 +6,35 @@ const LABELS: Record<Verdict, string> = {
   PASS: "PASS — Recommend not applying",
 };
 
-const STYLE: Record<Verdict, string> = {
-  GO: "bg-forge-red text-pure-white",
-  FIX_FIRST: "bg-forge-gold text-carbon-core",
-  PASS: "bg-echo text-pure-white",
+const STYLE: Record<Verdict, { background: string; color: string }> = {
+  GO: { background: "#14532d", color: "#4ade80" },
+  FIX_FIRST: { background: "#713f12", color: "#fbbf24" },
+  PASS: { background: "#7f1d1d", color: "#f87171" },
 };
 
-export const verdictAccentClass: Record<Verdict, string> = {
-  GO: "border-t-forge-red",
-  FIX_FIRST: "border-t-forge-gold",
-  PASS: "border-t-echo",
+export const verdictAccentColor: Record<Verdict, string> = {
+  GO: "#4ade80",
+  FIX_FIRST: "#fbbf24",
+  PASS: "#f87171",
 };
 
 export function VerdictBadge({ verdict }: { verdict: Verdict }) {
+  const s = STYLE[verdict];
   return (
     <span
-      className={`inline-flex shrink-0 items-center self-start rounded-md px-3 py-2 font-mono text-xs font-bold uppercase tracking-[0.1em] ${STYLE[verdict]}`}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        padding: "8px 12px",
+        borderRadius: 6,
+        fontWeight: 700,
+        fontSize: 11,
+        letterSpacing: "0.1em",
+        fontFamily: "var(--ls-mono, ui-monospace, monospace)",
+        background: s.background,
+        color: s.color,
+        whiteSpace: "nowrap",
+      }}
     >
       {LABELS[verdict]}
     </span>

@@ -18,10 +18,10 @@ export default function StartPage() {
         <ProgressBar step={1} />
         <div className="card-layer-1 flex flex-col gap-2">
           <p className="section-label">Step 1 — Paste</p>
-          <h1 className="text-2xl font-semibold tracking-tight text-carbon-core sm:text-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-[#e8e4de] sm:text-3xl">
             Diagnose your resume against any job description.
           </h1>
-          <p className="text-base text-carbon-core">
+          <p className="text-base text-[#a8a29e]">
             Honest verdict, ATS parsing flags, real gaps. Then we tailor — without
             inventing experience you didn&apos;t claim.
           </p>

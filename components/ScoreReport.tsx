@@ -35,7 +35,6 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
-  // Load fonts
   try {
     await document.fonts.load("700 14px 'DM Sans'");
     await document.fonts.load("400 14px 'DM Mono'");
@@ -48,13 +47,10 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
   const muted = "#a8a29e";
   const dim = "#78716c";
   const border = "#2a2a2a";
-  const cardBg = "#1a1a1a";
 
-  // Background
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, W, H);
 
-  // Subtle grain overlay
   ctx.fillStyle = "rgba(255,255,255,0.015)";
   for (let i = 0; i < W; i += 4) {
     for (let j = 0; j < H; j += 4) {
@@ -65,19 +61,16 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
   const PAD = 56;
   let y = PAD;
 
-  // Brand name
   ctx.font = `400 28px 'Instrument Serif', 'Georgia', serif`;
   ctx.fillStyle = light;
   ctx.fillText("Resume Verdict", PAD, y + 28);
 
-  // URL
   ctx.font = `400 14px 'DM Mono', monospace`;
   ctx.fillStyle = dim;
   ctx.fillText("resumeverdict.app", W - PAD - ctx.measureText("resumeverdict.app").width, y + 28);
 
   y += 60;
 
-  // Divider
   ctx.strokeStyle = border;
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -86,7 +79,6 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
   ctx.stroke();
   y += 32;
 
-  // Verdict badge + score
   const vc = verdictColors(diagnosis.verdict);
   const BADGE_W = 180;
   const BADGE_H = 46;
@@ -100,7 +92,6 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
   const badgeLabelW = ctx.measureText(vc.label).width;
   ctx.fillText(vc.label, PAD + (BADGE_W - badgeLabelW) / 2, y + BADGE_H / 2 + 7);
 
-  // Match score
   ctx.font = `700 52px 'DM Sans', sans-serif`;
   ctx.fillStyle = light;
   ctx.fillText(`${diagnosis.matchScore}`, PAD + BADGE_W + 24, y + BADGE_H - 2);
@@ -111,7 +102,6 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
 
   y += BADGE_H + 36;
 
-  // Score breakdown bars
   const components = [
     { label: "Keyword Match", score: diagnosis.scoreBreakdown.keywordMatch.score },
     { label: "Experience Relevance", score: diagnosis.scoreBreakdown.experienceRelevance.score },
@@ -122,29 +112,24 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
   const BAR_H = 20;
   const BAR_TRACK = 320;
   const LABEL_W = 200;
-  const SCORE_W = 40;
 
   for (const comp of components) {
-    // Label
     ctx.font = `400 13px 'DM Sans', sans-serif`;
     ctx.fillStyle = muted;
     ctx.fillText(comp.label, PAD, y + BAR_H - 3);
 
-    // Track bg
     const trackX = PAD + LABEL_W;
     ctx.fillStyle = scoreBarBg(comp.score);
     ctx.beginPath();
     ctx.roundRect(trackX, y, BAR_TRACK, BAR_H, 4);
     ctx.fill();
 
-    // Fill
     const fillW = Math.round((comp.score / 100) * BAR_TRACK);
     ctx.fillStyle = scoreColor(comp.score);
     ctx.beginPath();
     ctx.roundRect(trackX, y, fillW, BAR_H, 4);
     ctx.fill();
 
-    // Score label
     ctx.font = `700 13px 'DM Mono', monospace`;
     ctx.fillStyle = light;
     ctx.fillText(`${comp.score}`, trackX + BAR_TRACK + 12, y + BAR_H - 3);
@@ -154,7 +139,6 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
 
   y += 12;
 
-  // Divider
   ctx.strokeStyle = border;
   ctx.lineWidth = 1;
   ctx.beginPath();
@@ -163,10 +147,8 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
   ctx.stroke();
   y += 24;
 
-  // Top matches and critical gaps — two columns
   const COL_W = (W - PAD * 2 - 40) / 2;
 
-  // Top matches
   ctx.font = `700 12px 'DM Mono', monospace`;
   ctx.fillStyle = "#4ade80";
   ctx.fillText("TOP MATCHES", PAD, y + 14);
@@ -182,7 +164,6 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
   for (let i = 0; i < Math.max(matches.length, gaps.length); i++) {
     if (matches[i]) {
       const txt = `• ${matches[i]}`;
-      const maxW = COL_W - 8;
       ctx.font = `400 13px 'DM Sans', sans-serif`;
       ctx.fillStyle = light;
       const truncated = txt.length > 55 ? txt.slice(0, 52) + "..." : txt;
@@ -198,9 +179,6 @@ async function drawReport(canvas: HTMLCanvasElement, diagnosis: Diagnosis) {
     y += 22;
   }
 
-  y += 12;
-
-  // Bottom footer
   const footerY = H - 32;
   ctx.strokeStyle = border;
   ctx.lineWidth = 1;
@@ -278,14 +256,14 @@ export function ScoreReport({ diagnosis }: { diagnosis: Diagnosis }) {
         <button
           onClick={download}
           style={{ minHeight: 44 }}
-          className="inline-flex items-center gap-2 rounded-lg border border-soft-gray bg-pure-white px-5 py-3 text-sm font-semibold text-carbon-core transition hover:bg-ash-white"
+          className="inline-flex items-center gap-2 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-[#e8e4de] transition hover:bg-[#2a2a2a]"
         >
           Download Score Report
         </button>
         <button
           onClick={copyToClipboard}
           style={{ minHeight: 44 }}
-          className="inline-flex items-center gap-2 rounded-lg border border-soft-gray bg-pure-white px-5 py-3 text-sm font-semibold text-carbon-core transition hover:bg-ash-white"
+          className="inline-flex items-center gap-2 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-[#e8e4de] transition hover:bg-[#2a2a2a]"
         >
           {copyStatus === "idle" && "Copy to Clipboard"}
           {copyStatus === "copied" && "Copied!"}

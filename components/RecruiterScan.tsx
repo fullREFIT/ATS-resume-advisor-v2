@@ -23,7 +23,7 @@ function ScanVerdictBadge({ verdict }: { verdict: ScanVerdict }) {
         fontWeight: 700,
         fontSize: 12,
         letterSpacing: "0.1em",
-        fontFamily: "var(--font-jetbrains-mono, monospace)",
+        fontFamily: "var(--ls-mono, ui-monospace, monospace)",
         background: s.background,
         color: s.color,
       }}
@@ -67,25 +67,25 @@ export function RecruiterScanSection({ resumeText }: { resumeText: string }) {
         <button
           onClick={runScan}
           style={{ minHeight: 44 }}
-          className="inline-flex items-center justify-center rounded-lg border border-soft-gray bg-pure-white px-5 py-3 text-sm font-semibold text-carbon-core transition hover:bg-ash-white"
+          className="inline-flex items-center justify-center rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-[#e8e4de] transition hover:bg-[#2a2a2a]"
         >
           Run 6-Second Recruiter Scan
         </button>
       )}
 
       {status === "loading" && (
-        <p className="text-sm text-echo">Simulating recruiter scan...</p>
+        <p className="text-sm text-[#a8a29e]">Simulating recruiter scan...</p>
       )}
 
       {status === "error" && (
         <div className="flex flex-col gap-2">
-          <p className="rounded-lg border border-forge-red/30 bg-forge-red/10 p-3 text-sm text-forge-red">
+          <p className="rounded-lg border border-[#f87171]/30 bg-[#7f1d1d]/20 p-3 text-sm text-[#f87171]">
             {errorMsg}
           </p>
           <button
             onClick={runScan}
             style={{ minHeight: 44 }}
-            className="inline-flex w-fit items-center rounded-lg border border-soft-gray bg-pure-white px-5 py-3 text-sm font-semibold text-carbon-core transition hover:bg-ash-white"
+            className="inline-flex w-fit items-center rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-[#e8e4de] transition hover:bg-[#2a2a2a]"
           >
             Try again
           </button>
@@ -97,7 +97,7 @@ export function RecruiterScanSection({ resumeText }: { resumeText: string }) {
           {/* First impression */}
           <div>
             <p className="section-label mb-1">First impression (2 seconds)</p>
-            <p className="text-base italic leading-relaxed text-carbon-core">
+            <p className="text-base italic leading-relaxed text-[#e8e4de]">
               &ldquo;{scan.firstImpression}&rdquo;
             </p>
           </div>
@@ -105,7 +105,7 @@ export function RecruiterScanSection({ resumeText }: { resumeText: string }) {
           {/* What they noticed */}
           <div>
             <p className="section-label mb-2">What the recruiter noticed</p>
-            <ol className="ml-5 list-decimal text-sm leading-relaxed text-carbon-core">
+            <ol className="ml-5 list-decimal text-sm leading-relaxed text-[#e8e4de]">
               {scan.sixSecondScan.noticed.map((item, i) => (
                 <li key={i}>{item}</li>
               ))}
@@ -116,7 +116,7 @@ export function RecruiterScanSection({ resumeText }: { resumeText: string }) {
           {scan.sixSecondScan.missed.length > 0 && (
             <div>
               <p className="section-label mb-2">What they missed (didn&apos;t reach in 6 seconds)</p>
-              <ul className="ml-5 list-disc text-sm leading-relaxed text-echo">
+              <ul className="ml-5 list-disc text-sm leading-relaxed text-[#a8a29e]">
                 {scan.sixSecondScan.missed.map((item, i) => (
                   <li key={i}>{item}</li>
                 ))}
@@ -126,9 +126,9 @@ export function RecruiterScanSection({ resumeText }: { resumeText: string }) {
 
           {/* Red flags */}
           {scan.sixSecondScan.redFlags.length > 0 && (
-            <div className="rounded-lg border border-forge-gold/30 bg-forge-gold/10 p-3">
-              <p className="section-label mb-2 text-forge-dark">Red flags noticed</p>
-              <ul className="ml-5 list-disc text-sm leading-relaxed text-carbon-core">
+            <div className="rounded-lg border border-[#fbbf24]/30 bg-[#713f12]/20 p-3">
+              <p className="section-label mb-2" style={{ color: "#fbbf24" }}>Red flags noticed</p>
+              <ul className="ml-5 list-disc text-sm leading-relaxed text-[#e8e4de]">
                 {scan.sixSecondScan.redFlags.map((flag, i) => (
                   <li key={i}>{flag}</li>
                 ))}
@@ -142,15 +142,15 @@ export function RecruiterScanSection({ resumeText }: { resumeText: string }) {
               <p className="section-label">Recruiter decision</p>
               <ScanVerdictBadge verdict={scan.advanceOrReject} />
             </div>
-            <p className="text-sm leading-relaxed text-carbon-core">
+            <p className="text-sm leading-relaxed text-[#e8e4de]">
               {scan.advanceReasoning}
             </p>
           </div>
 
           {/* One thing to change */}
-          <div className="rounded-lg border border-soft-gray bg-ash-white p-3">
+          <div className="rounded-lg border border-[#2a2a2a] bg-[#0a0a0a] p-3">
             <p className="section-label mb-1">Highest-impact change</p>
-            <p className="text-sm leading-relaxed text-carbon-core">
+            <p className="text-sm leading-relaxed text-[#e8e4de]">
               {scan.oneThingToChange}
             </p>
           </div>

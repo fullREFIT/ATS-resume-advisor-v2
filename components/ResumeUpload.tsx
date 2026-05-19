@@ -54,11 +54,11 @@ export function ResumeUpload({ onParsed }: Props) {
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-soft-gray bg-pure-white px-4 text-sm font-medium text-carbon-core transition-colors hover:bg-soft-gray/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-red disabled:opacity-50"
+          className="inline-flex min-h-11 items-center gap-2 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-4 text-sm font-medium text-[#e8e4de] transition-colors hover:bg-[#2a2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4ade80] disabled:opacity-50"
         >
           {busy ? "Parsing…" : "Upload .pdf or .docx"}
         </button>
-        <span className="text-xs text-echo">
+        <span className="text-xs text-[#a8a29e]">
           Or paste plain text below.
         </span>
       </div>
@@ -70,17 +70,16 @@ export function ResumeUpload({ onParsed }: Props) {
         onChange={(e) => {
           const f = e.target.files?.[0];
           if (f) handle(f);
-          // Reset value so the same file can be re-uploaded.
           if (inputRef.current) inputRef.current.value = "";
         }}
       />
       {info && (
-        <p className="text-xs text-echo" role="status">
+        <p className="text-xs text-[#a8a29e]" role="status">
           {info}
         </p>
       )}
       {error && (
-        <p className="text-xs text-forge-red" role="alert">
+        <p className="text-xs text-[#f87171]" role="alert">
           {error}
         </p>
       )}

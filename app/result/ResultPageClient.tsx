@@ -117,7 +117,7 @@ export function ResultPageClient() {
   }
 
   if (!session) {
-    return <p className="text-sm text-echo">Loading your result…</p>;
+    return <p className="text-sm text-[#a8a29e]">Loading your result…</p>;
   }
 
   // Build intake answers array from session
@@ -151,7 +151,7 @@ export function ResultPageClient() {
       />
     );
   }
-  return <p className="text-sm text-echo">Loading your result…</p>;
+  return <p className="text-sm text-[#a8a29e]">Loading your result…</p>;
 }
 
 function RoleResultView({
@@ -181,10 +181,10 @@ function RoleResultView({
     <>
       <div className="card-layer-1 flex flex-col gap-2">
         <p className="section-label">Step 4 — Result</p>
-        <h1 className="text-2xl font-semibold tracking-tight text-carbon-core sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-[#e8e4de] sm:text-3xl">
           Your tailored resume + interview prep.
         </h1>
-        <p className="text-base text-carbon-core">
+        <p className="text-base text-[#a8a29e]">
           Bullets are ATS-optimized and verified against your inputs. Nothing
           fabricated.
         </p>
@@ -192,10 +192,10 @@ function RoleResultView({
 
       <section className="card-surface flex flex-col gap-1">
         <p className="section-label mb-1">Contact</p>
-        <p className="text-base font-semibold text-carbon-core">
+        <p className="text-base font-semibold text-[#e8e4de]">
           {tailored.contact.name}
         </p>
-        {contactLine && <p className="text-sm text-echo">{contactLine}</p>}
+        {contactLine && <p className="text-sm text-[#a8a29e]">{contactLine}</p>}
       </section>
 
       <section className="card-surface flex flex-col gap-3">
@@ -203,7 +203,7 @@ function RoleResultView({
           <p className="section-label">Professional summary</p>
           <CopyButton text={tailored.summary} />
         </div>
-        <p className="text-base leading-relaxed text-carbon-core">
+        <p className="text-base leading-relaxed text-[#e8e4de]">
           {tailored.summary}
         </p>
       </section>
@@ -216,7 +216,7 @@ function RoleResultView({
       {tailored.skills?.length > 0 && (
         <section className="card-surface">
           <p className="section-label mb-2">Skills</p>
-          <p className="text-sm leading-relaxed text-carbon-core">
+          <p className="text-sm leading-relaxed text-[#e8e4de]">
             {tailored.skills.join(" · ")}
           </p>
         </section>
@@ -229,7 +229,7 @@ function RoleResultView({
             {tailored.keywordsIntegrated.map((k, i) => (
               <span
                 key={i}
-                className="inline-flex items-center rounded-full border border-soft-gray bg-ash-white px-3 py-1 font-mono text-xs uppercase tracking-[0.06em] text-carbon-core"
+                className="inline-flex items-center rounded-full border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-1 font-mono text-xs uppercase tracking-[0.06em] text-[#4ade80]"
               >
                 {k}
               </span>
@@ -239,21 +239,21 @@ function RoleResultView({
       )}
 
       {tailored.keywordsMissed?.length > 0 && (
-        <section className="card-surface border-l-[3px] border-l-forge-gold">
-          <p className="section-label mb-2 text-forge-dark">
+        <section className="card-surface" style={{ borderLeft: "3px solid #fbbf24" }}>
+          <p className="section-label mb-2" style={{ color: "#fbbf24" }}>
             JD keywords NOT integrated (no supporting evidence)
           </p>
           <div className="flex flex-wrap gap-2">
             {tailored.keywordsMissed.map((k, i) => (
               <span
                 key={i}
-                className="inline-flex items-center rounded-full border border-soft-gray bg-pure-white px-3 py-1 font-mono text-xs uppercase tracking-[0.06em] text-echo"
+                className="inline-flex items-center rounded-full border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-1 font-mono text-xs uppercase tracking-[0.06em] text-[#a8a29e]"
               >
                 {k}
               </span>
             ))}
           </div>
-          <p className="mt-2 text-xs leading-relaxed text-echo">
+          <p className="mt-2 text-xs leading-relaxed text-[#a8a29e]">
             These were in the JD but your resume + intake answers didn&apos;t
             support them. Stuffing them anyway would trigger the
             claimed-vs-demonstrated mismatch check. Add evidence and rerun if
@@ -326,18 +326,18 @@ function CompanyResultView({
     <>
       <div className="card-layer-1 flex flex-col gap-2">
         <p className="section-label">Step 4 — Result</p>
-        <h1 className="text-2xl font-semibold tracking-tight text-carbon-core sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-[#e8e4de] sm:text-3xl">
           Your cold-outreach kit.
         </h1>
-        <p className="text-base text-carbon-core">
+        <p className="text-base text-[#a8a29e]">
           A tailored resume, a positioning angle, and a draft message you can
           send. All grounded in their site and your inputs.
         </p>
       </div>
 
-      <section className="card-surface border-t-[3px] border-t-forge-red">
+      <section className="card-surface" style={{ borderTop: "3px solid #4ade80" }}>
         <p className="section-label mb-2">Positioning angle</p>
-        <p className="text-base leading-relaxed text-carbon-core">
+        <p className="text-base leading-relaxed text-[#e8e4de]">
           {tailored.coldOutreachAngle.positioning}
         </p>
       </section>
@@ -347,10 +347,10 @@ function CompanyResultView({
           <p className="section-label">Draft message</p>
           <CopyButton text={tailored.coldOutreachAngle.draftMessage} />
         </div>
-        <pre className="whitespace-pre-wrap font-sans text-base leading-relaxed text-carbon-core">
+        <pre className="whitespace-pre-wrap font-sans text-base leading-relaxed text-[#e8e4de]">
           {tailored.coldOutreachAngle.draftMessage}
         </pre>
-        <p className="mt-3 text-xs text-echo">
+        <p className="mt-3 text-xs text-[#a8a29e]">
           Read it once before sending. Anything that doesn&apos;t sound like
           you, edit. You&apos;re signing it.
         </p>
@@ -359,12 +359,12 @@ function CompanyResultView({
       {tailored.companyHooksUsed?.length > 0 && (
         <section className="card-surface">
           <p className="section-label mb-2">What the message references</p>
-          <ul className="ml-5 list-disc text-sm leading-relaxed text-carbon-core">
+          <ul className="ml-5 list-disc text-sm leading-relaxed text-[#e8e4de]">
             {tailored.companyHooksUsed.map((h, i) => (
               <li key={i}>{h}</li>
             ))}
           </ul>
-          <p className="mt-2 text-xs text-echo">
+          <p className="mt-2 text-xs text-[#a8a29e]">
             Every claim above is from their site. Nothing invented.
           </p>
         </section>
@@ -377,10 +377,10 @@ function CompanyResultView({
 
       <section className="card-surface flex flex-col gap-1">
         <p className="section-label mb-1">Contact</p>
-        <p className="text-base font-semibold text-carbon-core">
+        <p className="text-base font-semibold text-[#e8e4de]">
           {tailored.contact.name}
         </p>
-        {contactLine && <p className="text-sm text-echo">{contactLine}</p>}
+        {contactLine && <p className="text-sm text-[#a8a29e]">{contactLine}</p>}
       </section>
 
       <section className="card-surface flex flex-col gap-3">
@@ -388,7 +388,7 @@ function CompanyResultView({
           <p className="section-label">Professional summary</p>
           <CopyButton text={tailored.summary} />
         </div>
-        <p className="text-base leading-relaxed text-carbon-core">
+        <p className="text-base leading-relaxed text-[#e8e4de]">
           {tailored.summary}
         </p>
       </section>
@@ -401,7 +401,7 @@ function CompanyResultView({
       {tailored.skills?.length > 0 && (
         <section className="card-surface">
           <p className="section-label mb-2">Skills</p>
-          <p className="text-sm leading-relaxed text-carbon-core">
+          <p className="text-sm leading-relaxed text-[#e8e4de]">
             {tailored.skills.join(" · ")}
           </p>
         </section>
@@ -467,7 +467,7 @@ function DownloadDocxButton({
         {busy ? "Building .docx…" : "Download resume as .docx"}
       </Button>
       {err && (
-        <p className="text-xs text-forge-red" role="alert">
+        <p className="text-xs text-[#f87171]" role="alert">
           {err}
         </p>
       )}

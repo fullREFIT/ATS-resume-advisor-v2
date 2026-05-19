@@ -79,7 +79,7 @@ export function DiagnosePageClient() {
 
   const isLoaded = mode === "role" ? !!diagnosis : !!companyFit;
   if (!isLoaded) {
-    return <p className="text-sm text-echo">Loading your analysis…</p>;
+    return <p className="text-sm text-[#a8a29e]">Loading your analysis…</p>;
   }
 
   const canContinue =
@@ -141,12 +141,12 @@ export function DiagnosePageClient() {
     <>
       <div className="card-layer-1 flex flex-col gap-2">
         <p className="section-label">Step 2 — Diagnosis</p>
-        <h1 className="text-2xl font-semibold tracking-tight text-carbon-core sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-[#e8e4de] sm:text-3xl">
           {mode === "company"
             ? "Here's the honest read on this company."
             : "Here's the honest read."}
         </h1>
-        <p className="text-base text-carbon-core">
+        <p className="text-base text-[#a8a29e]">
           {mode === "company"
             ? "Grounded in what's actually on their site. Anything not on the site is not asserted."
             : "Parsing failure is the #1 cause of low ATS rankings — flagged first when present."}
@@ -170,7 +170,7 @@ export function DiagnosePageClient() {
       {error && (
         <p
           role="alert"
-          className="rounded-lg border border-forge-red/30 bg-forge-red/10 p-3 text-sm text-forge-red"
+          className="rounded-lg border border-[#f87171]/30 bg-[#7f1d1d]/20 p-3 text-sm text-[#f87171]"
         >
           {error}
         </p>
@@ -197,9 +197,9 @@ export function DiagnosePageClient() {
       </div>
 
       {mode === "role" && !canContinue && (
-        <div className="card-surface border-l-[3px] border-l-echo">
+        <div className="card-surface border-l-[3px] border-l-[#a8a29e]">
           <p className="section-label mb-2">Why we won&apos;t tailor this</p>
-          <p className="text-sm leading-relaxed text-carbon-core">
+          <p className="text-sm leading-relaxed text-[#e8e4de]">
             The gap is too wide. Tailoring keywords can&apos;t close a missing
             requirement, and stuffing keywords without evidence raises a
             fabrication flag at the recruiter layer. Build the evidence first

@@ -15,14 +15,14 @@ export default function AboutPage() {
       <main className="mx-auto flex w-full max-w-[720px] flex-1 flex-col gap-8 px-4 py-6 sm:px-6 sm:py-10">
         <div className="card-layer-1 flex flex-col gap-2">
           <p className="section-label">Methodology</p>
-          <h1 className="text-2xl font-semibold tracking-tight text-carbon-core sm:text-3xl">
+          <h1 className="text-2xl font-semibold tracking-tight text-[#e8e4de] sm:text-3xl">
             Honest diagnosis. Real tailoring. No fabrication.
           </h1>
         </div>
 
         <section className="flex flex-col gap-3">
           <p className="section-label">How it works</p>
-          <p className="text-base leading-relaxed text-carbon-core">
+          <p className="text-base leading-relaxed text-[#e8e4de]">
             Most resume tools stuff keywords or tell you everything is fine.
             This one diagnoses the gap first, asks targeted questions to
             surface evidence you actually have, then tailors using only what
@@ -35,13 +35,13 @@ export default function AboutPage() {
           <p className="section-label">
             How applicant tracking systems actually work
           </p>
-          <p className="text-base leading-relaxed text-carbon-core">
+          <p className="text-base leading-relaxed text-[#e8e4de]">
             The 75% auto-rejection number is a myth — about 92% of ATS
             configurations don&apos;t auto-reject resumes based on content. The
             real problem is being ranked so low that no recruiter ever sees
             you.
           </p>
-          <p className="text-base leading-relaxed text-carbon-core">
+          <p className="text-base leading-relaxed text-[#e8e4de]">
             Parsing failure causes roughly 30% of low rankings — the single
             biggest cause. Multi-column layouts, tables, text boxes, graphics,
             headers/footers, and image-based PDFs (Canva and Figma exports are
@@ -50,7 +50,7 @@ export default function AboutPage() {
             section headings, no tables, no graphics, Calibri 11pt — because
             plain is what every ATS reads cleanly.
           </p>
-          <p className="text-base leading-relaxed text-carbon-core">
+          <p className="text-base leading-relaxed text-[#e8e4de]">
             Modern systems like Workday, Greenhouse, and Lever also use
             semantic scoring and skill taxonomies on top of keyword matching,
             so vocabulary depth matters. Workday and some iCIMS configs
@@ -61,7 +61,7 @@ export default function AboutPage() {
 
         <section className="flex flex-col gap-3">
           <p className="section-label">The no-fabrication promise</p>
-          <p className="text-base leading-relaxed text-carbon-core">
+          <p className="text-base leading-relaxed text-[#e8e4de]">
             Three layers stop the AI from inventing experience you don&apos;t
             have. The system prompts forbid it. The Socratic intake forces
             real evidence into the input before tailoring runs. And a final
@@ -73,7 +73,7 @@ export default function AboutPage() {
 
         <section className="flex flex-col gap-3">
           <p className="section-label">Disclaimer</p>
-          <p className="text-sm leading-relaxed text-echo">
+          <p className="text-sm leading-relaxed text-[#a8a29e]">
             This tool gives suggestions based on the inputs you provide. It is
             not legal advice, career-counseling advice, or a substitute for
             professional review. You are responsible for the accuracy of the
@@ -81,11 +81,11 @@ export default function AboutPage() {
           </p>
         </section>
 
-        <section className="overflow-hidden rounded-xl bg-forge-dark p-6 text-ash-white sm:p-8">
-          <p className="section-label mb-3 !text-forge-gold">
+        <section className="overflow-hidden rounded-xl bg-[#0f1a12] border border-[#2a2a2a] p-6 sm:p-8">
+          <p className="section-label mb-3" style={{ color: "#4ade80" }}>
             Built by full/REFIT
           </p>
-          <p className="text-lg leading-relaxed text-ash-white">
+          <p className="text-lg leading-relaxed text-[#e8e4de]">
             This tool is built by full/REFIT — we build operational AI systems
             and equip teams to use them. If a free tool can solve a problem
             this specific, imagine what a custom system inside your company
@@ -95,7 +95,7 @@ export default function AboutPage() {
             href="https://fullrefit.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex min-h-12 items-center gap-2 rounded-lg bg-forge-red px-5 font-semibold text-pure-white hover:bg-forge-red-hover"
+            className="mt-4 inline-flex min-h-12 items-center gap-2 rounded-lg bg-[#4ade80] px-5 font-semibold text-[#0a0a0a] hover:bg-[#22c55e]"
           >
             See what we build →
           </a>
@@ -104,7 +104,7 @@ export default function AboutPage() {
         <div>
           <Link
             href="/start"
-            className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-forge-red hover:text-forge-red-hover"
+            className="inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[#a8a29e] hover:text-[#e8e4de]"
           >
             ← Back to the tool
           </Link>

@@ -24,23 +24,23 @@ export function ProgressBar({ step }: { step: 1 | 2 | 3 | 4 }) {
               aria-current={isActive ? "step" : undefined}
               className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-mono text-xs font-semibold ${
                 isActive
-                  ? "bg-forge-red text-pure-white"
+                  ? "bg-[#4ade80] text-[#0a0a0a]"
                   : isComplete
-                    ? "bg-carbon-core text-pure-white"
-                    : "bg-soft-gray text-echo"
+                    ? "bg-[#e8e4de] text-[#0a0a0a]"
+                    : "bg-[#2a2a2a] text-[#a8a29e]"
               }`}
             >
               {n}
             </span>
             <span
               className={`hidden text-xs font-medium sm:inline ${
-                isActive ? "text-carbon-core" : "text-echo"
+                isActive ? "text-[#e8e4de]" : "text-[#a8a29e]"
               }`}
             >
               {s.label}
             </span>
             {idx < STEPS.length - 1 && (
-              <span className="ml-1 hidden h-px flex-1 bg-soft-gray sm:block" />
+              <span className="ml-1 hidden h-px flex-1 bg-[#2a2a2a] sm:block" />
             )}
           </li>
         );

@@ -145,25 +145,25 @@ export function CoverLetterSection(props: Props) {
         <button
           onClick={generate}
           style={{ minHeight: 44 }}
-          className="inline-flex w-full items-center justify-center rounded-lg border border-soft-gray bg-pure-white px-5 py-3 text-sm font-semibold text-carbon-core transition hover:bg-ash-white sm:w-auto"
+          className="inline-flex w-full items-center justify-center rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-[#e8e4de] transition hover:bg-[#2a2a2a] sm:w-auto"
         >
           Generate Cover Letter
         </button>
       )}
 
       {status === "loading" && (
-        <p className="text-sm text-echo">Writing your cover letter...</p>
+        <p className="text-sm text-[#a8a29e]">Writing your cover letter...</p>
       )}
 
       {status === "error" && (
         <div className="flex flex-col gap-2">
-          <p className="rounded-lg border border-forge-red/30 bg-forge-red/10 p-3 text-sm text-forge-red">
+          <p className="rounded-lg border border-[#f87171]/30 bg-[#7f1d1d]/20 p-3 text-sm text-[#f87171]">
             {errorMsg}
           </p>
           <button
             onClick={generate}
             style={{ minHeight: 44 }}
-            className="inline-flex w-fit items-center rounded-lg border border-soft-gray bg-pure-white px-5 py-3 text-sm font-semibold text-carbon-core transition hover:bg-ash-white"
+            className="inline-flex w-fit items-center rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-[#e8e4de] transition hover:bg-[#2a2a2a]"
           >
             Try again
           </button>
@@ -173,40 +173,36 @@ export function CoverLetterSection(props: Props) {
       {status === "done" && output && (
         <div className="flex flex-col gap-4">
           <div className="card-surface flex flex-col gap-3">
-            {/* Header row */}
             <div className="flex flex-wrap items-center justify-between gap-2">
               <p className="section-label">Your cover letter</p>
               <CopyButton text={output.coverLetter} />
             </div>
 
-            {/* Cover letter text */}
-            <pre className="whitespace-pre-wrap font-sans text-base leading-relaxed text-carbon-core">
+            <pre className="whitespace-pre-wrap font-sans text-base leading-relaxed text-[#e8e4de]">
               {output.coverLetter}
             </pre>
 
-            {/* Download docx */}
             <div className="flex flex-col gap-1">
               <button
                 onClick={handleDocxDownload}
                 disabled={docxBusy}
                 style={{ minHeight: 44 }}
-                className="inline-flex w-fit items-center rounded-lg border border-soft-gray bg-pure-white px-5 py-3 text-sm font-semibold text-carbon-core transition hover:bg-ash-white disabled:opacity-60"
+                className="inline-flex w-fit items-center rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] px-5 py-3 text-sm font-semibold text-[#e8e4de] transition hover:bg-[#2a2a2a] disabled:opacity-60"
               >
                 {docxBusy ? "Building .docx..." : "Download as .docx"}
               </button>
               {docxErr && (
-                <p className="text-xs text-forge-red" role="alert">
+                <p className="text-xs text-[#f87171]" role="alert">
                   {docxErr}
                 </p>
               )}
             </div>
           </div>
 
-          {/* Key evidence */}
           {output.keyEvidence.length > 0 && (
             <div className="card-surface">
               <p className="section-label mb-2">Evidence used</p>
-              <ul className="ml-5 list-disc text-sm leading-relaxed text-carbon-core">
+              <ul className="ml-5 list-disc text-sm leading-relaxed text-[#e8e4de]">
                 {output.keyEvidence.map((e, i) => (
                   <li key={i}>{e}</li>
                 ))}
@@ -214,8 +210,7 @@ export function CoverLetterSection(props: Props) {
             </div>
           )}
 
-          {/* Tone check */}
-          <p className="text-xs text-echo">{output.toneCheck}</p>
+          <p className="text-xs text-[#a8a29e]">{output.toneCheck}</p>
         </div>
       )}
     </section>

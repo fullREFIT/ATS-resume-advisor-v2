@@ -33,7 +33,7 @@ function HistoryVerdictBadge({ verdict }: { verdict: Verdict }) {
         fontWeight: 700,
         fontSize: 10,
         letterSpacing: "0.08em",
-        fontFamily: "var(--font-jetbrains-mono, monospace)",
+        fontFamily: "var(--ls-mono, ui-monospace, monospace)",
         background: s.bg,
         color: s.color,
         whiteSpace: "nowrap",
@@ -69,7 +69,7 @@ export function SessionHistory() {
         <p className="section-label">Your history</p>
         <button
           onClick={handleClear}
-          className="text-xs text-echo underline hover:text-carbon-core"
+          className="text-xs text-[#a8a29e] underline hover:text-[#e8e4de]"
         >
           Clear history
         </button>
@@ -81,36 +81,31 @@ export function SessionHistory() {
             {shown.map((entry, i) => (
               <tr
                 key={entry.id}
-                className={`border-b border-soft-gray last:border-b-0 ${i % 2 === 0 ? "bg-pure-white" : "bg-ash-white"}`}
+                className={`border-b border-[#2a2a2a] last:border-b-0 ${i % 2 === 0 ? "bg-[#1a1a1a]" : "bg-[#141414]"}`}
               >
-                {/* Date */}
-                <td className="px-3 py-2 text-xs text-echo whitespace-nowrap">
+                <td className="px-3 py-2 text-xs text-[#a8a29e] whitespace-nowrap">
                   {formatDate(entry.date)}
                 </td>
 
-                {/* Mode icon */}
-                <td className="px-3 py-2 text-xs text-echo">
+                <td className="px-3 py-2 text-xs text-[#a8a29e]">
                   {entry.mode === "role" ? "💼" : "🏢"}
                 </td>
 
-                {/* Job title or company name */}
-                <td className="px-3 py-2 text-xs text-carbon-core max-w-[180px] truncate">
+                <td className="px-3 py-2 text-xs text-[#e8e4de] max-w-[180px] truncate">
                   {entry.mode === "role"
                     ? (entry.jobTitle ?? "Unknown role")
                     : (entry.companyName ?? "Unknown company")}
                 </td>
 
-                {/* Verdict or label */}
                 <td className="px-3 py-2">
                   {entry.mode === "role" && entry.verdict ? (
                     <HistoryVerdictBadge verdict={entry.verdict} />
                   ) : (
-                    <span className="text-xs text-echo font-mono">Cold Outreach</span>
+                    <span className="text-xs text-[#a8a29e] font-mono">Cold Outreach</span>
                   )}
                 </td>
 
-                {/* Score */}
-                <td className="px-3 py-2 text-xs font-mono text-echo whitespace-nowrap">
+                <td className="px-3 py-2 text-xs font-mono text-[#a8a29e] whitespace-nowrap">
                   {entry.mode === "role" && entry.matchScore != null
                     ? `${entry.matchScore}/100`
                     : ""}
@@ -124,7 +119,7 @@ export function SessionHistory() {
       {history.length > 5 && (
         <button
           onClick={() => setExpanded((v) => !v)}
-          className="text-xs text-echo underline hover:text-carbon-core self-start"
+          className="text-xs text-[#a8a29e] underline hover:text-[#e8e4de] self-start"
         >
           {expanded ? "Show less" : `Show all ${history.length} entries`}
         </button>

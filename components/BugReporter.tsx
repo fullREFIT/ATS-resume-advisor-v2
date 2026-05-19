@@ -5,7 +5,6 @@ import { usePathname } from "next/navigation";
 
 type Phase = "idle" | "open" | "recording" | "submitting" | "done" | "error";
 
-// SpeechRecognition is not in the default TypeScript lib for browsers.
 type SpeechRecognitionInstance = {
   continuous: boolean;
   interimResults: boolean;
@@ -109,7 +108,7 @@ export function BugReporter() {
       <button
         onClick={openReporter}
         aria-label="Report a problem"
-        className="fixed bottom-5 right-5 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-soft-gray bg-pure-white shadow-sm hover:border-forge-red hover:text-forge-red transition-colors"
+        className="fixed bottom-5 right-5 z-40 flex h-10 w-10 items-center justify-center rounded-full border border-[#2a2a2a] bg-[#1a1a1a] shadow-sm hover:border-[#4ade80] hover:text-[#4ade80] text-[#a8a29e] transition-colors"
         style={{ display: phase !== "idle" ? "none" : undefined }}
       >
         <BugIcon />
@@ -118,22 +117,22 @@ export function BugReporter() {
       {/* Overlay */}
       {phase !== "idle" && (
         <div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-carbon-core/40 sm:items-center"
+          className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center"
           onClick={(e) => e.target === e.currentTarget && closeReporter()}
         >
-          <div className="w-full max-w-md rounded-t-2xl bg-pure-white p-6 shadow-xl sm:rounded-2xl">
+          <div className="w-full max-w-md rounded-t-2xl bg-[#1a1a1a] border border-[#2a2a2a] p-6 shadow-xl sm:rounded-2xl">
 
             {/* Header */}
             <div className="mb-4 flex items-start justify-between gap-3">
               <div>
                 <p className="section-label mb-0.5">Feedback</p>
-                <p className="text-base font-semibold text-carbon-core">
+                <p className="text-base font-semibold text-[#e8e4de]">
                   Report a problem
                 </p>
               </div>
               <button
                 onClick={closeReporter}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-echo hover:text-carbon-core"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#a8a29e] hover:text-[#e8e4de]"
                 aria-label="Close"
               >
                 ✕
@@ -143,21 +142,21 @@ export function BugReporter() {
             {/* Done state */}
             {phase === "done" && (
               <div className="flex flex-col items-center gap-3 py-6 text-center">
-                <span className="text-3xl">✓</span>
-                <p className="text-sm font-semibold text-carbon-core">Got it — thanks.</p>
-                <p className="text-sm text-echo">We&apos;ll look into it.</p>
+                <span className="text-3xl text-[#4ade80]">✓</span>
+                <p className="text-sm font-semibold text-[#e8e4de]">Got it — thanks.</p>
+                <p className="text-sm text-[#a8a29e]">We&apos;ll look into it.</p>
               </div>
             )}
 
             {/* Error state */}
             {phase === "error" && (
               <div className="flex flex-col gap-3">
-                <p className="text-sm text-carbon-core">
+                <p className="text-sm text-[#e8e4de]">
                   Something went wrong sending your report. Try again?
                 </p>
                 <button
                   onClick={() => setPhase("open")}
-                  className="inline-flex min-h-10 items-center justify-center rounded-lg bg-forge-red px-4 text-sm font-semibold text-pure-white hover:bg-forge-red-hover"
+                  className="inline-flex min-h-10 items-center justify-center rounded-lg bg-[#4ade80] px-4 text-sm font-semibold text-[#0a0a0a] hover:bg-[#22c55e]"
                 >
                   Try again
                 </button>
@@ -174,13 +173,13 @@ export function BugReporter() {
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe what happened…"
                     rows={4}
-                    className="w-full resize-none rounded-lg border border-soft-gray bg-ash-white p-3 text-sm text-carbon-core placeholder:text-echo focus:border-forge-red focus:outline-none"
+                    className="w-full resize-none rounded-lg border border-[#2a2a2a] bg-[#0a0a0a] p-3 text-sm text-[#e8e4de] placeholder:text-[#78716c] focus:border-[#4ade80] focus:outline-none"
                     disabled={phase === "submitting"}
                   />
                   {phase === "recording" && (
-                    <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-pure-white/80">
-                      <span className="flex items-center gap-2 text-sm font-semibold text-forge-red">
-                        <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-forge-red" />
+                    <div className="absolute inset-0 flex items-center justify-center rounded-lg bg-[#1a1a1a]/80">
+                      <span className="flex items-center gap-2 text-sm font-semibold text-[#4ade80]">
+                        <span className="inline-block h-2 w-2 animate-pulse rounded-full bg-[#4ade80]" />
                         Listening…
                       </span>
                     </div>
@@ -188,32 +187,30 @@ export function BugReporter() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {/* Voice button (if supported) */}
                   {voiceSupported && (
                     <button
                       onClick={phase === "recording" ? stopRecording : startRecording}
                       aria-label={phase === "recording" ? "Stop recording" : "Speak your issue"}
                       className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors ${
                         phase === "recording"
-                          ? "border-forge-red bg-forge-red text-pure-white"
-                          : "border-soft-gray bg-pure-white text-echo hover:border-forge-red hover:text-forge-red"
+                          ? "border-[#4ade80] bg-[#4ade80] text-[#0a0a0a]"
+                          : "border-[#2a2a2a] bg-[#1a1a1a] text-[#a8a29e] hover:border-[#4ade80] hover:text-[#4ade80]"
                       }`}
                     >
                       <MicIcon />
                     </button>
                   )}
 
-                  {/* Submit */}
                   <button
                     onClick={submit}
                     disabled={description.trim().length < 5 || phase === "submitting" || phase === "recording"}
-                    className="flex-1 inline-flex min-h-10 items-center justify-center rounded-lg bg-forge-red px-4 text-sm font-semibold text-pure-white hover:bg-forge-red-hover disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="flex-1 inline-flex min-h-10 items-center justify-center rounded-lg bg-[#4ade80] px-4 text-sm font-semibold text-[#0a0a0a] hover:bg-[#22c55e] disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {phase === "submitting" ? "Sending…" : "Send report"}
                   </button>
                 </div>
 
-                <p className="text-[0.6875rem] text-echo">
+                <p className="text-[0.6875rem] text-[#78716c]">
                   Sends the page you&apos;re on and your browser info along with your description.
                 </p>
               </div>

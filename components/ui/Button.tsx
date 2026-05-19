@@ -3,14 +3,14 @@ import { forwardRef, type ButtonHTMLAttributes } from "react";
 type Variant = "primary" | "secondary" | "ghost";
 
 const base =
-  "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-red focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-40";
+  "inline-flex items-center justify-center gap-2 rounded-lg font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4ade80] focus-visible:ring-offset-2 focus-visible:ring-offset-[#0a0a0a] disabled:cursor-not-allowed disabled:opacity-40";
 
 const variants: Record<Variant, string> = {
   primary:
-    "min-h-12 bg-forge-red px-6 text-pure-white hover:bg-forge-red-hover",
+    "min-h-12 bg-[#4ade80] px-6 text-[#0a0a0a] hover:bg-[#22c55e]",
   secondary:
-    "min-h-11 border border-soft-gray bg-transparent px-5 text-carbon-core hover:bg-soft-gray/40",
-  ghost: "min-h-10 px-3 text-carbon-core hover:bg-soft-gray/40",
+    "min-h-11 border border-[#2a2a2a] bg-transparent px-5 text-[#e8e4de] hover:bg-[#2a2a2a]/60",
+  ghost: "min-h-10 px-3 text-[#e8e4de] hover:bg-[#2a2a2a]/60",
 };
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

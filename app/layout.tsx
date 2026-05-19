@@ -1,18 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Instrument_Serif, DM_Sans, DM_Mono } from "next/font/google";
 import { BugReporter } from "@/components/BugReporter";
 import { BypassCapture } from "@/components/BypassCapture";
 import "./globals.css";
 
-const outfit = Outfit({
-  variable: "--font-outfit",
+const serif = Instrument_Serif({
+  weight: "400",
+  style: ["normal", "italic"],
   subsets: ["latin"],
+  variable: "--ls-serif",
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
+const sans = DM_Sans({
   subsets: ["latin"],
+  variable: "--ls-sans",
+  display: "swap",
+});
+
+const mono = DM_Mono({
+  weight: ["400", "500"],
+  subsets: ["latin"],
+  variable: "--ls-mono",
   display: "swap",
 });
 
@@ -36,9 +45,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${jetbrainsMono.variable}`}
+      className={`${serif.variable} ${sans.variable} ${mono.variable}`}
     >
-      <body className="min-h-screen flex flex-col bg-ash-white text-carbon-core">
+      <body className="min-h-screen flex flex-col bg-[#0a0a0a] text-[#e8e4de]">
         <BypassCapture />
         {children}
         <BugReporter />

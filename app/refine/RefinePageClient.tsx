@@ -58,7 +58,7 @@ export function RefinePageClient() {
   }, [router]);
 
   if (!questions) {
-    return <p className="text-sm text-echo">Loading your intake…</p>;
+    return <p className="text-sm text-[#a8a29e]">Loading your intake…</p>;
   }
 
   const allAnswered = questions.every(
@@ -130,10 +130,10 @@ export function RefinePageClient() {
     <>
       <div className="card-layer-1 flex flex-col gap-2">
         <p className="section-label">Step 3 — Refine</p>
-        <h1 className="text-2xl font-semibold tracking-tight text-carbon-core sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-[#e8e4de] sm:text-3xl">
           Five questions to surface real evidence.
         </h1>
-        <p className="text-base text-carbon-core">
+        <p className="text-base text-[#a8a29e]">
           Specific answers — outcomes, numbers, tools — produce stronger
           {mode === "company" ? " positioning" : " bullets"}. Vague answers
           produce vague output.
@@ -153,15 +153,15 @@ export function RefinePageClient() {
           return (
             <li key={q.id} className="card-surface flex flex-col gap-3">
               <div className="flex items-start gap-3">
-                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-carbon-core font-mono text-xs font-bold text-pure-white">
+                <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#e8e4de] font-mono text-xs font-bold text-[#0a0a0a]">
                   {i + 1}
                 </span>
                 <div className="flex-1">
-                  <p className="text-base font-semibold leading-snug text-carbon-core">
+                  <p className="text-base font-semibold leading-snug text-[#e8e4de]">
                     {q.question}
                   </p>
-                  <p className="mt-1 text-xs text-echo">
-                    <span className="font-mono uppercase tracking-[0.08em] text-forge-red">
+                  <p className="mt-1 text-xs text-[#a8a29e]">
+                    <span className="font-mono uppercase tracking-[0.08em] text-[#4ade80]">
                       Category:
                     </span>{" "}
                     {q.category} · {q.why}
@@ -172,10 +172,10 @@ export function RefinePageClient() {
                 value={value}
                 onChange={(e) => updateAnswer(q.id, e.target.value)}
                 placeholder="Be specific. Numbers, tools, outcomes."
-                className="min-h-[120px] w-full rounded-lg border border-soft-gray bg-pure-white p-3 text-base text-carbon-core focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-red"
+                className="min-h-[120px] w-full rounded-lg border border-[#2a2a2a] bg-[#0a0a0a] p-3 text-base text-[#e8e4de] placeholder:text-[#78716c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4ade80]"
               />
               {tooShort && (
-                <p className="text-xs text-echo">
+                <p className="text-xs text-[#a8a29e]">
                   Add more — at least {MIN_ANSWER_LEN} characters.
                 </p>
               )}
@@ -187,7 +187,7 @@ export function RefinePageClient() {
       {error && (
         <p
           role="alert"
-          className="rounded-lg border border-forge-red/30 bg-forge-red/10 p-3 text-sm text-forge-red"
+          className="rounded-lg border border-[#f87171]/30 bg-[#7f1d1d]/20 p-3 text-sm text-[#f87171]"
         >
           {error}
         </p>

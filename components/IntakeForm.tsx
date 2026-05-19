@@ -22,6 +22,9 @@ function isLikelyUrl(s: string): boolean {
   return /^https?:\/\/[^\s]+\.[^\s]+/.test(s.trim());
 }
 
+const INPUT_CLASS =
+  "w-full rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] p-4 text-base text-[#e8e4de] placeholder:text-[#78716c] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4ade80]";
+
 export function IntakeForm() {
   const router = useRouter();
   const [mode, setMode] = useState<IntakeMode>("role");
@@ -43,7 +46,6 @@ export function IntakeForm() {
     setHydrated(true);
   }, []);
 
-  // Persist mode immediately so refresh keeps the user's choice.
   function onChangeMode(next: IntakeMode) {
     setMode(next);
     patchSession({ mode: next });
@@ -84,7 +86,6 @@ export function IntakeForm() {
         });
         router.push("/diagnose");
       } else {
-        // Company mode: fetch URL, then diagnose against the fetched content.
         const fetched = await callApi<
           { url: string },
           { company?: FetchedCompanyContent }
@@ -150,10 +151,10 @@ export function IntakeForm() {
           value={resume}
           onChange={(e) => setResume(e.target.value)}
           placeholder="Paste your current resume here. Plain text works best."
-          className="min-h-[200px] w-full rounded-lg border border-soft-gray bg-pure-white p-4 text-base text-carbon-core focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-red"
+          className={`min-h-[200px] ${INPUT_CLASS}`}
         />
         {hydrated && resume.trim().length > 0 && resume.trim().length < 50 && (
-          <p className="text-xs text-echo">
+          <p className="text-xs text-[#a8a29e]">
             Add more — at least 50 characters of resume content.
           </p>
         )}
@@ -169,7 +170,7 @@ export function IntakeForm() {
             value={jd}
             onChange={(e) => setJd(e.target.value)}
             placeholder="Paste the full job description for the role you're targeting."
-            className="min-h-[180px] w-full rounded-lg border border-soft-gray bg-pure-white p-4 text-base text-carbon-core focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-red"
+            className={`min-h-[180px] ${INPUT_CLASS}`}
           />
         </div>
       ) : (
@@ -185,12 +186,12 @@ export function IntakeForm() {
               onChange={(e) => setCompanyUrl(e.target.value)}
               placeholder="https://www.example.com"
               autoComplete="off"
-              className="min-h-12 w-full rounded-lg border border-soft-gray bg-pure-white px-3 text-base text-carbon-core focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-red"
+              className={`min-h-12 px-3 ${INPUT_CLASS.replace("p-4", "")}`}
             />
             {hydrated &&
               companyUrl.trim().length > 0 &&
               LINKEDIN_RE.test(companyUrl) && (
-                <p className="text-xs text-forge-red">
+                <p className="text-xs text-[#f87171]">
                   LinkedIn blocks automated reads. Use the company&apos;s own
                   website instead (e.g., their About page).
                 </p>
@@ -198,7 +199,7 @@ export function IntakeForm() {
             {hydrated &&
               companyUrl.trim().length > 0 &&
               !isLikelyUrl(companyUrl) && (
-                <p className="text-xs text-echo">
+                <p className="text-xs text-[#a8a29e]">
                   Include https:// or http:// at the start.
                 </p>
               )}
@@ -214,9 +215,9 @@ export function IntakeForm() {
               onChange={(e) => setDesiredRole(e.target.value)}
               placeholder="e.g. Director of Sales, VP Operations, Head of Customer Success"
               autoComplete="off"
-              className="min-h-12 w-full rounded-lg border border-soft-gray bg-pure-white px-3 text-base text-carbon-core focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-red"
+              className={`min-h-12 px-3 ${INPUT_CLASS.replace("p-4", "")}`}
             />
-            <p className="text-xs text-echo">
+            <p className="text-xs text-[#a8a29e]">
               Helps anchor the tailoring. Leave blank and the tool will infer
               from your background.
             </p>
@@ -227,7 +228,7 @@ export function IntakeForm() {
       {error && (
         <p
           role="alert"
-          className="rounded-lg border border-forge-red/30 bg-forge-red/10 p-3 text-sm text-forge-red"
+          className="rounded-lg border border-[#f87171]/30 bg-[#7f1d1d]/20 p-3 text-sm text-[#f87171]"
         >
           {error}
         </p>

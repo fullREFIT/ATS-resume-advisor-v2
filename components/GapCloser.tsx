@@ -20,7 +20,7 @@ function SmallVerdictBadge({ verdict }: { verdict: "GO" | "FIX_FIRST" }) {
         fontWeight: 700,
         fontSize: 11,
         letterSpacing: "0.1em",
-        fontFamily: "var(--font-jetbrains-mono, monospace)",
+        fontFamily: "var(--ls-mono, ui-monospace, monospace)",
         background: s.background,
         color: s.color,
       }}
@@ -33,22 +33,22 @@ function SmallVerdictBadge({ verdict }: { verdict: "GO" | "FIX_FIRST" }) {
 function ActionCard({ action }: { action: GapCloserAction }) {
   return (
     <div className="card-surface flex flex-col gap-1">
-      <p className="text-sm font-semibold leading-snug text-carbon-core">{action.action}</p>
-      <p className="text-xs leading-relaxed text-echo">
-        <span className="font-medium text-carbon-core">Why:</span> {action.why}
+      <p className="text-sm font-semibold leading-snug text-[#e8e4de]">{action.action}</p>
+      <p className="text-xs leading-relaxed text-[#a8a29e]">
+        <span className="font-medium text-[#e8e4de]">Why:</span> {action.why}
       </p>
-      <p className="text-xs text-echo">
-        <span className="font-medium text-carbon-core">Impact:</span> {action.estimatedScoreImpact}
+      <p className="text-xs text-[#a8a29e]">
+        <span className="font-medium text-[#e8e4de]">Impact:</span> {action.estimatedScoreImpact}
       </p>
       {action.resource && (
-        <p className="text-xs text-echo">
-          <span className="font-medium text-carbon-core">Resource:</span>{" "}
+        <p className="text-xs text-[#a8a29e]">
+          <span className="font-medium text-[#e8e4de]">Resource:</span>{" "}
           {action.resource.startsWith("http") ? (
             <a
               href={action.resource}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-forge-red underline"
+              className="text-[#4ade80] underline"
             >
               {action.resource}
             </a>
@@ -105,7 +105,6 @@ export function GapCloser({ verdict, resume, jd, diagnosis }: Props) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shouldFetch]);
 
-  // Only renders for FIX_FIRST or PASS
   if (!shouldFetch) return null;
 
   if (loading) {
@@ -113,10 +112,10 @@ export function GapCloser({ verdict, resume, jd, diagnosis }: Props) {
       <section className="flex flex-col gap-3">
         <p className="section-label">Gap Closer — 30/60/90-Day Plan</p>
         <div className="card-surface flex flex-col gap-3">
-          <div className="h-4 w-3/4 animate-pulse rounded bg-soft-gray" />
-          <div className="h-4 w-1/2 animate-pulse rounded bg-soft-gray" />
-          <div className="h-4 w-2/3 animate-pulse rounded bg-soft-gray" />
-          <p className="text-xs text-echo">Building your action plan...</p>
+          <div className="h-4 w-3/4 animate-pulse rounded bg-[#2a2a2a]" />
+          <div className="h-4 w-1/2 animate-pulse rounded bg-[#2a2a2a]" />
+          <div className="h-4 w-2/3 animate-pulse rounded bg-[#2a2a2a]" />
+          <p className="text-xs text-[#a8a29e]">Building your action plan...</p>
         </div>
       </section>
     );
@@ -126,7 +125,7 @@ export function GapCloser({ verdict, resume, jd, diagnosis }: Props) {
     return (
       <section className="flex flex-col gap-3">
         <p className="section-label">Gap Closer — 30/60/90-Day Plan</p>
-        <p className="rounded-lg border border-forge-red/30 bg-forge-red/10 p-3 text-sm text-forge-red">
+        <p className="rounded-lg border border-[#f87171]/30 bg-[#7f1d1d]/20 p-3 text-sm text-[#f87171]">
           {error}
         </p>
       </section>
@@ -145,15 +144,14 @@ export function GapCloser({ verdict, resume, jd, diagnosis }: Props) {
     <section className="flex flex-col gap-4">
       <p className="section-label">Gap Closer — 30/60/90-Day Plan</p>
 
-      {/* Three columns on desktop, stacked on mobile */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {columns.map(({ label, actions }) => (
           <div key={label} className="flex flex-col gap-2">
-            <p className="text-xs font-bold uppercase tracking-[0.1em] text-carbon-core font-mono">
+            <p className="text-xs font-bold uppercase tracking-[0.1em] text-[#e8e4de] font-mono">
               {label}
             </p>
             {actions.length === 0 ? (
-              <p className="text-xs text-echo">No actions for this period.</p>
+              <p className="text-xs text-[#a8a29e]">No actions for this period.</p>
             ) : (
               actions.map((a, i) => <ActionCard key={i} action={a} />)
             )}
@@ -161,11 +159,10 @@ export function GapCloser({ verdict, resume, jd, diagnosis }: Props) {
         ))}
       </div>
 
-      {/* Structural gaps */}
       {plan.structuralGaps.length > 0 && (
-        <div className="card-surface border-l-[3px] border-l-echo">
+        <div className="card-surface" style={{ borderLeft: "3px solid #a8a29e" }}>
           <p className="section-label mb-2">Gaps that require time, not coursework</p>
-          <ul className="ml-5 list-disc text-sm leading-relaxed text-carbon-core">
+          <ul className="ml-5 list-disc text-sm leading-relaxed text-[#e8e4de]">
             {plan.structuralGaps.map((gap, i) => (
               <li key={i}>{gap}</li>
             ))}
@@ -173,14 +170,13 @@ export function GapCloser({ verdict, resume, jd, diagnosis }: Props) {
         </div>
       )}
 
-      {/* Projected score bottom bar */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-soft-gray bg-ash-white px-4 py-3">
-        <span className="text-sm font-medium text-carbon-core">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-[#2a2a2a] bg-[#141414] px-4 py-3">
+        <span className="text-sm font-medium text-[#e8e4de]">
           Current score:{" "}
           <span className="font-bold">{diagnosis.matchScore}/100</span>
         </span>
-        <span className="text-echo">→</span>
-        <span className="text-sm font-medium text-carbon-core">
+        <span className="text-[#a8a29e]">→</span>
+        <span className="text-sm font-medium text-[#e8e4de]">
           Projected after 90 days:{" "}
           <span className="font-bold">{plan.projectedScoreAfter90Days}/100</span>
         </span>

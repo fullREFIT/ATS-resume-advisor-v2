@@ -23,7 +23,7 @@ export function CopyButton({
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex min-h-9 items-center gap-1 rounded-md border border-soft-gray bg-pure-white px-3 text-xs font-medium text-carbon-core transition-colors hover:bg-soft-gray/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-red"
+      className="inline-flex min-h-9 items-center gap-1 rounded-md border border-[#2a2a2a] bg-[#1a1a1a] px-3 text-xs font-medium text-[#e8e4de] transition-colors hover:bg-[#2a2a2a] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#4ade80]"
     >
       {copied ? "Copied" : label}
     </button>
