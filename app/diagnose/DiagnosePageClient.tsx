@@ -8,13 +8,19 @@ import { GapCloser } from "@/components/GapCloser";
 import { ScoreReport } from "@/components/ScoreReport";
 import { Button } from "@/components/ui/Button";
 import { callApi } from "@/lib/api-fetch";
-import { clearSession, loadSession, patchSession } from "@/lib/storage";
+import { clearSession, loadSession, patchSession, pushHistory } from "@/lib/storage";
 import type {
   CompanyFit,
   Diagnosis,
   IntakeMode,
   QuestionsResponse,
 } from "@/lib/types";
+
+function extractJobTitle(jd: string): string {
+  const firstLine = jd.split("\n")[0]?.trim() ?? "";
+  if (firstLine.length > 0 && firstLine.length <= 80) return firstLine;
+  return jd.slice(0, 60).replace(/\n/g, " ").trim() || "Unknown";
+}
 
 export function DiagnosePageClient() {
   const router = useRouter();
@@ -40,6 +46,11 @@ export function DiagnosePageClient() {
       setResume(s.resume);
       setCompanyContent(s.companyContent.text);
       setDesiredRole(s.desiredRole);
+      // Record history entry for company mode
+      pushHistory({
+        mode: "company",
+        companyName: s.companyFit.companyName,
+      });
     } else {
       if (!s.diagnosis || !s.resume || !s.jd) {
         router.replace("/start");
@@ -49,6 +60,20 @@ export function DiagnosePageClient() {
       setDiagnosis(s.diagnosis);
       setResume(s.resume);
       setJd(s.jd);
+      // Record history entry for role mode
+      pushHistory({
+        mode: "role",
+        verdict: s.diagnosis.verdict,
+        matchScore: s.diagnosis.matchScore,
+        scoreBreakdown: {
+          keywordMatch: s.diagnosis.scoreBreakdown.keywordMatch.score,
+          experienceRelevance: s.diagnosis.scoreBreakdown.experienceRelevance.score,
+          trajectoryFit: s.diagnosis.scoreBreakdown.trajectoryFit.score,
+          atsParsing: s.diagnosis.scoreBreakdown.atsParsing.score,
+        },
+        jobTitle: extractJobTitle(s.jd),
+        companyName: undefined,
+      });
     }
   }, [router]);
 

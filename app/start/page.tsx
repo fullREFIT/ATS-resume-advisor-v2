@@ -2,6 +2,7 @@ import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ProgressBar } from "@/components/ProgressBar";
 import { IntakeForm } from "@/components/IntakeForm";
+import { SessionHistory } from "@/components/SessionHistory";
 
 export const metadata = {
   title: "Start — Resume Verdict",
@@ -26,6 +27,7 @@ export default function StartPage() {
           </p>
         </div>
         <IntakeForm />
+        <SessionHistory />
       </main>
       <Footer />
     </>
