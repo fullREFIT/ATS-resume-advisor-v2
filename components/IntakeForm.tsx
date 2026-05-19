@@ -31,6 +31,7 @@ export function IntakeForm() {
   const [resume, setResume] = useState("");
   const [jd, setJd] = useState("");
   const [companyUrl, setCompanyUrl] = useState("");
+  const [companyText, setCompanyText] = useState("");
   const [desiredRole, setDesiredRole] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,6 +44,7 @@ export function IntakeForm() {
     setJd(s.jd);
     setCompanyUrl(s.companyUrl);
     setDesiredRole(s.desiredRole);
+    setCompanyText("");
     setHydrated(true);
   }, []);
 
@@ -86,14 +88,29 @@ export function IntakeForm() {
         });
         router.push("/diagnose");
       } else {
-        const fetched = await callApi<
-          { url: string },
-          { company?: FetchedCompanyContent }
-        >({
-          endpoint: "fetch-company",
-          body: { url: companyUrl.trim() },
-        });
-        if (!fetched.company) throw new Error("Couldn't read that website.");
+        const pastedContent = companyText.trim();
+        const usePaste = pastedContent.length >= 200;
+
+        let resolvedContent: FetchedCompanyContent;
+        if (usePaste) {
+          resolvedContent = {
+            url: companyUrl.trim(),
+            text: pastedContent,
+            charCount: pastedContent.length,
+            fetchedAt: Date.now(),
+          };
+        } else {
+          const fetched = await callApi<
+            { url: string },
+            { company?: FetchedCompanyContent }
+          >({
+            endpoint: "fetch-company",
+            body: { url: companyUrl.trim() },
+          });
+          if (!fetched.company) throw new Error("Couldn't read that website.");
+          resolvedContent = fetched.company;
+        }
+
         const data = await callApi<
           {
             resume: string;
@@ -106,8 +123,8 @@ export function IntakeForm() {
           endpoint: "company-diagnose",
           body: {
             resume,
-            companyContent: fetched.company.text,
-            companyUrl: fetched.company.url,
+            companyContent: resolvedContent.text,
+            companyUrl: resolvedContent.url,
             desiredRole: desiredRole.trim() || undefined,
           },
         });
@@ -117,7 +134,7 @@ export function IntakeForm() {
           resume,
           companyUrl: companyUrl.trim(),
           desiredRole: desiredRole.trim(),
-          companyContent: fetched.company,
+          companyContent: resolvedContent,
           companyFit: data.fit,
           diagnosis: undefined,
           tailored: undefined,
@@ -203,6 +220,28 @@ export function IntakeForm() {
                   Include https:// or http:// at the start.
                 </p>
               )}
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="company-text" className="section-label">
+              Or paste company content directly (optional)
+            </label>
+            <textarea
+              id="company-text"
+              value={companyText}
+              onChange={(e) => setCompanyText(e.target.value)}
+              placeholder="Paste their About page, homepage text, or any description. If provided, this is used instead of fetching the URL — helpful when the site is hard to scrape."
+              className={`min-h-[120px] ${INPUT_CLASS}`}
+            />
+            {companyText.trim().length > 0 && companyText.trim().length < 200 && (
+              <p className="text-xs text-[#a8a29e]">
+                Add more — at least 200 characters needed to use pasted content.
+              </p>
+            )}
+            {companyText.trim().length >= 200 && (
+              <p className="text-xs text-[#4ade80]">
+                Pasted content will be used directly — URL fetch skipped.
+              </p>
+            )}
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="desired-role" className="section-label">
