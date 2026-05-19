@@ -7,6 +7,7 @@ import { CopyButton } from "@/components/CopyButton";
 import { InfoBlock } from "@/components/ui/InfoBlock";
 import { InterviewPrep } from "@/components/InterviewPrep";
 import { TailoredExperience } from "@/components/TailoredBullets";
+import { RecruiterScanSection } from "@/components/RecruiterScan";
 import { clearSession, loadSession, saveSession } from "@/lib/storage";
 import { TargetPersonsPanel } from "@/components/TargetPersonsPanel";
 import type {
@@ -17,6 +18,35 @@ import type {
   TargetPersonArchetype,
   TargetPersonsResponse,
 } from "@/lib/types";
+
+function buildPlainTextResume(tailored: TailoredOutput | CompanyTailoredOutput): string {
+  const lines: string[] = [];
+  lines.push(tailored.contact.name);
+  const contactParts = [
+    tailored.contact.location,
+    tailored.contact.phone,
+    tailored.contact.email,
+    tailored.contact.linkedin,
+  ].filter(Boolean);
+  if (contactParts.length > 0) lines.push(contactParts.join(" | "));
+  lines.push("");
+  lines.push("SUMMARY");
+  lines.push(tailored.summary);
+  lines.push("");
+  lines.push("EXPERIENCE");
+  for (const exp of tailored.experience) {
+    lines.push(`${exp.company} — ${exp.title} | ${exp.dates}${exp.location ? " | " + exp.location : ""}`);
+    for (const b of exp.bullets) {
+      lines.push(`• ${b.rewritten}`);
+    }
+    lines.push("");
+  }
+  if (tailored.skills?.length > 0) {
+    lines.push("SKILLS");
+    lines.push(tailored.skills.join(", "));
+  }
+  return lines.join("\n");
+}
 
 export function ResultPageClient() {
   const router = useRouter();
@@ -111,6 +141,7 @@ function RoleResultView({
   tailored: TailoredOutput;
   onStartOver: () => void;
 }) {
+  const resumeText = buildPlainTextResume(tailored);
   const contactLine = [
     tailored.contact.location,
     tailored.contact.phone,
@@ -210,6 +241,8 @@ function RoleResultView({
         <InterviewPrep prep={tailored.interviewPrep} />
       </section>
 
+      <RecruiterScanSection resumeText={resumeText} />
+
       <InfoBlock tone="gold">
         <strong>LinkedIn consistency check.</strong> Before you submit through a
         Workday or iCIMS portal, verify your LinkedIn job titles and dates
@@ -238,6 +271,7 @@ function CompanyResultView({
   onFetchTargetPersons: () => Promise<void>;
   onStartOver: () => void;
 }) {
+  const resumeText = buildPlainTextResume(tailored);
   const contactLine = [
     tailored.contact.location,
     tailored.contact.phone,
@@ -336,6 +370,8 @@ function CompanyResultView({
         <p className="section-label">If they reply, prep for these</p>
         <InterviewPrep prep={tailored.interviewPrep} />
       </section>
+
+      <RecruiterScanSection resumeText={resumeText} />
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <DownloadDocxButton tailored={tailored} />

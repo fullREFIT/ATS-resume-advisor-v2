@@ -146,6 +146,19 @@ export interface SessionState {
   updatedAt: number;
 }
 
+// T1 — 6-Second Recruiter Scan
+export interface RecruiterScan {
+  firstImpression: string;
+  sixSecondScan: {
+    noticed: string[];
+    missed: string[];
+    redFlags: string[];
+  };
+  advanceOrReject: "ADVANCE" | "REJECT" | "MAYBE";
+  advanceReasoning: string;
+  oneThingToChange: string;
+}
+
 export const EMPTY_SESSION: SessionState = {
   mode: "role",
   resume: "",
