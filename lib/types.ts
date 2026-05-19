@@ -146,6 +146,23 @@ export interface SessionState {
   updatedAt: number;
 }
 
+// T2 — Gap Closer Action Plan
+export interface GapCloserAction {
+  action: string;
+  why: string;
+  estimatedScoreImpact: string;
+  resource: string | null;
+}
+
+export interface GapCloserPlan {
+  thirtyDays: GapCloserAction[];
+  sixtyDays: GapCloserAction[];
+  ninetyDays: GapCloserAction[];
+  structuralGaps: string[];
+  projectedScoreAfter90Days: number;
+  projectedVerdict: "GO" | "FIX_FIRST";
+}
+
 // T1 — 6-Second Recruiter Scan
 export interface RecruiterScan {
   firstImpression: string;

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { DiagnosisCard } from "@/components/DiagnosisCard";
 import { CompanyFitCard } from "@/components/CompanyFitCard";
+import { GapCloser } from "@/components/GapCloser";
 import { Button } from "@/components/ui/Button";
 import { callApi } from "@/lib/api-fetch";
 import { clearSession, loadSession, patchSession } from "@/lib/storage";
@@ -127,6 +128,14 @@ export function DiagnosePageClient() {
       </div>
 
       {mode === "role" && diagnosis && <DiagnosisCard diagnosis={diagnosis} />}
+      {mode === "role" && diagnosis && (
+        <GapCloser
+          verdict={diagnosis.verdict}
+          resume={resume}
+          jd={jd}
+          diagnosis={diagnosis}
+        />
+      )}
       {mode === "company" && companyFit && (
         <CompanyFitCard fit={companyFit} />
       )}
