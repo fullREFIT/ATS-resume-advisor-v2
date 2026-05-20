@@ -13,12 +13,14 @@ type Limiter = {
 let cached: Limiter | null | undefined;
 
 function build(): Limiter | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url =
+    process.env.UPSTASH_REDIS_REST_URL ?? process.env.KV_REST_API_URL;
+  const token =
+    process.env.UPSTASH_REDIS_REST_TOKEN ?? process.env.KV_REST_API_TOKEN;
   if (!url || !token) {
     if (typeof process !== "undefined" && process.env.NODE_ENV !== "test") {
       console.warn(
-        "[ratelimit] UPSTASH_REDIS_REST_URL / _TOKEN not set — running without rate limit. Set these in production.",
+        "[ratelimit] No Upstash/KV credentials set — running without rate limit. Set UPSTASH_REDIS_REST_URL+TOKEN or KV_REST_API_URL+TOKEN in production.",
       );
     }
     return null;
@@ -81,5 +83,5 @@ export async function consumeQuota(req: Request): Promise<RateLimitResult> {
 
 export function rateLimitWarning(result: RateLimitResult): string | undefined {
   if (result.enforced) return undefined;
-  return "Rate limit not enforced. Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN in Vercel.";
+  return "Rate limit not enforced. Set UPSTASH_REDIS_REST_URL+TOKEN or KV_REST_API_URL+TOKEN in Vercel.";
 }
