@@ -46,7 +46,7 @@ const STEPS: Step[] = [
   {
     id: "step-02-upload",
     title: "Upload your resume",
-    what: "Click 'Try it free →' and paste or upload your current resume. How smooth is the upload or paste? Does the text preview look like your actual resume, or is something garbled?",
+    what: "Click 'Get my verdict →' and paste or upload your current resume. How smooth is the upload or paste? Does the text preview look like your actual resume, or is something garbled?",
     goTo: { href: "/start", label: "Go to /start" },
   },
   {

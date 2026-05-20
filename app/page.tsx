@@ -186,7 +186,7 @@ export default function LandingPage() {
                 transition: "background 0.2s",
               }}
             >
-              Try it free — no account needed →
+              Get my verdict — no signup →
             </Link>
             <Link
               href="#how-it-works"
@@ -583,7 +583,7 @@ export default function LandingPage() {
               href="/start"
               style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "16px 32px", background: "#fff", color: T.bgDark, borderRadius: 8, fontSize: 16, fontWeight: 700, ...ls("sans"), textDecoration: "none" }}
             >
-              Try it free →
+              Get my verdict →
             </Link>
             <p style={{ marginTop: 20, fontSize: 13, color: T.faint, ...ls("mono") }}>
               Takes about 10 minutes end to end.

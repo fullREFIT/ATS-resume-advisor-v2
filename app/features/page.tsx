@@ -305,7 +305,7 @@ export default function FeaturesPage() {
             textDecoration: "none",
           }}
         >
-          Try it free — no account →
+          Get my verdict — no signup →
         </Link>
       </section>
 
@@ -480,7 +480,7 @@ export default function FeaturesPage() {
               textDecoration: "none",
             }}
           >
-            Try it free →
+            Get my verdict →
           </Link>
           <p style={{ marginTop: 20, fontSize: 13, color: T.faint, ...ls("mono") }}>
             No account · No data stored · Free
