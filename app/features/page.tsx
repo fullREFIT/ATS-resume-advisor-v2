@@ -305,7 +305,7 @@ export default function FeaturesPage() {
             textDecoration: "none",
           }}
         >
-          Get my verdict — no signup →
+          100% free - no signup →
         </Link>
       </section>
 
@@ -480,7 +480,7 @@ export default function FeaturesPage() {
               textDecoration: "none",
             }}
           >
-            Get my verdict →
+            Get my free verdict →
           </Link>
           <p style={{ marginTop: 20, fontSize: 13, color: T.faint, ...ls("mono") }}>
             No account · No data stored · Free

@@ -48,7 +48,7 @@ export function LandingNav() {
             className="inline-flex items-center rounded-md bg-white px-[22px] py-[10px] text-sm font-bold text-[#0a0a0a] transition-colors hover:bg-[#e8e4de]"
             style={{ fontFamily: "var(--ls-sans), sans-serif" }}
           >
-            Get my verdict →
+            Get my free verdict →
           </Link>
         </div>
       </div>
