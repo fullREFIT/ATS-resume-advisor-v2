@@ -13,6 +13,7 @@ import type {
   CompanyFit,
   Diagnosis,
   FetchedCompanyContent,
+  FetchJdResponse,
   IntakeMode,
 } from "@/lib/types";
 
@@ -36,6 +37,73 @@ export function IntakeForm() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [jdInputMode, setJdInputMode] = useState<"text" | "url">("text");
+  const [jdUrl, setJdUrl] = useState("");
+  const [jdFetching, setJdFetching] = useState(false);
+  const [jdFetchTone, setJdFetchTone] = useState<
+    "success" | "warning" | "error" | null
+  >(null);
+  const [jdFetchMessage, setJdFetchMessage] = useState<string | null>(null);
+  const [jdDetected, setJdDetected] = useState<string | null>(null);
+
+  async function onFetchJd() {
+    setError(null);
+    setJdFetchTone(null);
+    setJdFetchMessage(null);
+    setJdDetected(null);
+    const trimmed = jdUrl.trim();
+    if (!/^https?:\/\//i.test(trimmed)) {
+      setJdFetchTone("error");
+      setJdFetchMessage("Include https:// or http:// at the start of the URL.");
+      return;
+    }
+    setJdFetching(true);
+    try {
+      const res = await fetch("/api/fetch-jd", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmed }),
+      });
+      const data = (await res.json()) as FetchJdResponse;
+      if (!data.success || !data.jdText) {
+        setJdFetchTone("error");
+        setJdFetchMessage(
+          data.error ?? "Couldn't extract the job description.",
+        );
+        return;
+      }
+      setJd(data.jdText);
+      setJdInputMode("text");
+      if (data.confidence === "high") {
+        setJdFetchTone("success");
+        setJdFetchMessage(
+          data.message ??
+            "Job description extracted. Review and edit if needed.",
+        );
+      } else {
+        setJdFetchTone("warning");
+        setJdFetchMessage(
+          data.message ??
+            "Extraction may be incomplete. Please review and edit the text below.",
+        );
+      }
+      if (data.jobTitle || data.company) {
+        const parts: string[] = [];
+        if (data.jobTitle) parts.push(data.jobTitle);
+        if (data.company) parts.push(`at ${data.company}`);
+        setJdDetected(parts.join(" "));
+      }
+    } catch (err) {
+      setJdFetchTone("error");
+      setJdFetchMessage(
+        err instanceof Error
+          ? err.message
+          : "Network error while fetching the job description.",
+      );
+    } finally {
+      setJdFetching(false);
+    }
+  }
 
   useEffect(() => {
     const s = loadSession();
@@ -182,13 +250,139 @@ export function IntakeForm() {
           <label htmlFor="jd" className="section-label">
             Target job description
           </label>
-          <textarea
-            id="jd"
-            value={jd}
-            onChange={(e) => setJd(e.target.value)}
-            placeholder="Paste the full job description for the role you're targeting."
-            className={`min-h-[180px] ${INPUT_CLASS}`}
-          />
+          <div
+            role="tablist"
+            aria-label="Job description input mode"
+            className="flex gap-1 border-b border-[#2a2a2a]"
+          >
+            <button
+              type="button"
+              role="tab"
+              aria-selected={jdInputMode === "text"}
+              onClick={() => setJdInputMode("text")}
+              style={{
+                minHeight: 44,
+                padding: "10px 16px",
+                fontSize: 14,
+                fontWeight: 600,
+                fontFamily: "var(--ls-sans), sans-serif",
+                background: "transparent",
+                color: jdInputMode === "text" ? "#e8e4de" : "#78716c",
+                border: "none",
+                borderBottom:
+                  jdInputMode === "text"
+                    ? "2px solid #4ade80"
+                    : "2px solid transparent",
+                cursor: "pointer",
+              }}
+            >
+              Paste text
+            </button>
+            <button
+              type="button"
+              role="tab"
+              aria-selected={jdInputMode === "url"}
+              onClick={() => setJdInputMode("url")}
+              style={{
+                minHeight: 44,
+                padding: "10px 16px",
+                fontSize: 14,
+                fontWeight: 600,
+                fontFamily: "var(--ls-sans), sans-serif",
+                background: "transparent",
+                color: jdInputMode === "url" ? "#e8e4de" : "#78716c",
+                border: "none",
+                borderBottom:
+                  jdInputMode === "url"
+                    ? "2px solid #4ade80"
+                    : "2px solid transparent",
+                cursor: "pointer",
+              }}
+            >
+              Paste URL
+            </button>
+          </div>
+
+          {jdInputMode === "url" && (
+            <div className="flex flex-col gap-2">
+              <input
+                id="jd-url"
+                type="url"
+                value={jdUrl}
+                onChange={(e) => setJdUrl(e.target.value)}
+                placeholder="Paste a job posting URL (LinkedIn, Indeed, Glassdoor, or company careers page)"
+                autoComplete="off"
+                className={`min-h-12 px-3 ${INPUT_CLASS.replace("p-4", "")}`}
+              />
+              <Button
+                type="button"
+                onClick={onFetchJd}
+                disabled={jdFetching || jdUrl.trim().length === 0}
+              >
+                {jdFetching ? "Fetching…" : "Fetch job description"}
+              </Button>
+              <p
+                style={{
+                  fontFamily: "var(--ls-mono), ui-monospace, monospace",
+                  fontSize: 12,
+                  color: "#78716c",
+                }}
+              >
+                Supports: LinkedIn · Indeed · Glassdoor · Greenhouse · Lever ·
+                Workday · Company careers pages
+              </p>
+            </div>
+          )}
+
+          {jdFetchMessage && (
+            <p
+              role="status"
+              className="rounded-lg border p-3 text-sm"
+              style={
+                jdFetchTone === "success"
+                  ? {
+                      borderColor: "rgba(74, 222, 128, 0.4)",
+                      background: "rgba(20, 83, 45, 0.2)",
+                      color: "#4ade80",
+                    }
+                  : jdFetchTone === "warning"
+                    ? {
+                        borderColor: "rgba(251, 191, 36, 0.4)",
+                        background: "rgba(113, 63, 18, 0.2)",
+                        color: "#fbbf24",
+                      }
+                    : {
+                        borderColor: "rgba(248, 113, 113, 0.4)",
+                        background: "rgba(127, 29, 29, 0.2)",
+                        color: "#f87171",
+                      }
+              }
+            >
+              {jdFetchMessage}
+            </p>
+          )}
+
+          {jdDetected && (
+            <p
+              style={{
+                fontFamily: "var(--ls-mono), ui-monospace, monospace",
+                fontSize: 12,
+                color: "#a8a29e",
+              }}
+            >
+              Detected: {jdDetected}
+            </p>
+          )}
+
+          {jdInputMode === "text" && (
+            <textarea
+              id="jd"
+              value={jd}
+              onChange={(e) => setJd(e.target.value)}
+              placeholder="Paste the full job description for the role you're targeting."
+              className={`min-h-[180px] ${INPUT_CLASS}`}
+            />
+          )}
         </div>
       ) : (
         <>

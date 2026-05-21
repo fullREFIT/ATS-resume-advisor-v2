@@ -9,6 +9,8 @@ import { InterviewPrep } from "@/components/InterviewPrep";
 import { TailoredExperience } from "@/components/TailoredBullets";
 import { RecruiterScanSection } from "@/components/RecruiterScan";
 import { CoverLetterSection } from "@/components/CoverLetter";
+import { ResumeDiff } from "@/components/ResumeDiff";
+import { ApplicationPackage } from "@/components/ApplicationPackage";
 import { clearSession, loadSession, saveSession } from "@/lib/storage";
 import { TargetPersonsPanel } from "@/components/TargetPersonsPanel";
 import type {
@@ -190,37 +192,43 @@ function RoleResultView({
         </p>
       </div>
 
-      <section className="card-surface flex flex-col gap-1">
-        <p className="section-label mb-1">Contact</p>
-        <p className="text-base font-semibold text-[#e8e4de]">
-          {tailored.contact.name}
-        </p>
-        {contactLine && <p className="text-sm text-[#a8a29e]">{contactLine}</p>}
-      </section>
+      <ResumeDiff originalText={resume} tailoredText={resumeText}>
+        <div className="flex flex-col gap-4">
+          <section className="card-surface flex flex-col gap-1">
+            <p className="section-label mb-1">Contact</p>
+            <p className="text-base font-semibold text-[#e8e4de]">
+              {tailored.contact.name}
+            </p>
+            {contactLine && (
+              <p className="text-sm text-[#a8a29e]">{contactLine}</p>
+            )}
+          </section>
 
-      <section className="card-surface flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="section-label">Professional summary</p>
-          <CopyButton text={tailored.summary} />
+          <section className="card-surface flex flex-col gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="section-label">Professional summary</p>
+              <CopyButton text={tailored.summary} />
+            </div>
+            <p className="text-base leading-relaxed text-[#e8e4de]">
+              {tailored.summary}
+            </p>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <p className="section-label">Tailored experience</p>
+            <TailoredExperience experience={tailored.experience} />
+          </section>
+
+          {tailored.skills?.length > 0 && (
+            <section className="card-surface">
+              <p className="section-label mb-2">Skills</p>
+              <p className="text-sm leading-relaxed text-[#e8e4de]">
+                {tailored.skills.join(" · ")}
+              </p>
+            </section>
+          )}
         </div>
-        <p className="text-base leading-relaxed text-[#e8e4de]">
-          {tailored.summary}
-        </p>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <p className="section-label">Tailored experience</p>
-        <TailoredExperience experience={tailored.experience} />
-      </section>
-
-      {tailored.skills?.length > 0 && (
-        <section className="card-surface">
-          <p className="section-label mb-2">Skills</p>
-          <p className="text-sm leading-relaxed text-[#e8e4de]">
-            {tailored.skills.join(" · ")}
-          </p>
-        </section>
-      )}
+      </ResumeDiff>
 
       {tailored.keywordsIntegrated.length > 0 && (
         <section className="card-surface">
@@ -282,6 +290,12 @@ function RoleResultView({
         match the resume exactly. Both vendors cross-reference and a mismatch
         downgrades your score.
       </InfoBlock>
+
+      <ApplicationPackage
+        mode="role"
+        tailored={tailored}
+        jobTitle={jd.split("\n")[0]?.trim().slice(0, 80) || undefined}
+      />
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <DownloadDocxButton tailored={tailored} />
@@ -375,37 +389,43 @@ function CompanyResultView({
         onFetch={onFetchTargetPersons}
       />
 
-      <section className="card-surface flex flex-col gap-1">
-        <p className="section-label mb-1">Contact</p>
-        <p className="text-base font-semibold text-[#e8e4de]">
-          {tailored.contact.name}
-        </p>
-        {contactLine && <p className="text-sm text-[#a8a29e]">{contactLine}</p>}
-      </section>
+      <ResumeDiff originalText={resume} tailoredText={resumeText}>
+        <div className="flex flex-col gap-4">
+          <section className="card-surface flex flex-col gap-1">
+            <p className="section-label mb-1">Contact</p>
+            <p className="text-base font-semibold text-[#e8e4de]">
+              {tailored.contact.name}
+            </p>
+            {contactLine && (
+              <p className="text-sm text-[#a8a29e]">{contactLine}</p>
+            )}
+          </section>
 
-      <section className="card-surface flex flex-col gap-3">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <p className="section-label">Professional summary</p>
-          <CopyButton text={tailored.summary} />
+          <section className="card-surface flex flex-col gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="section-label">Professional summary</p>
+              <CopyButton text={tailored.summary} />
+            </div>
+            <p className="text-base leading-relaxed text-[#e8e4de]">
+              {tailored.summary}
+            </p>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <p className="section-label">Tailored experience</p>
+            <TailoredExperience experience={tailored.experience} />
+          </section>
+
+          {tailored.skills?.length > 0 && (
+            <section className="card-surface">
+              <p className="section-label mb-2">Skills</p>
+              <p className="text-sm leading-relaxed text-[#e8e4de]">
+                {tailored.skills.join(" · ")}
+              </p>
+            </section>
+          )}
         </div>
-        <p className="text-base leading-relaxed text-[#e8e4de]">
-          {tailored.summary}
-        </p>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <p className="section-label">Tailored experience</p>
-        <TailoredExperience experience={tailored.experience} />
-      </section>
-
-      {tailored.skills?.length > 0 && (
-        <section className="card-surface">
-          <p className="section-label mb-2">Skills</p>
-          <p className="text-sm leading-relaxed text-[#e8e4de]">
-            {tailored.skills.join(" · ")}
-          </p>
-        </section>
-      )}
+      </ResumeDiff>
 
       <section className="flex flex-col gap-3">
         <p className="section-label">If they reply, prep for these</p>
@@ -421,6 +441,8 @@ function CompanyResultView({
       />
 
       <RecruiterScanSection resumeText={resumeText} />
+
+      <ApplicationPackage mode="company" tailored={tailored} />
 
       <div className="flex flex-col gap-3 sm:flex-row">
         <DownloadDocxButton tailored={tailored} />

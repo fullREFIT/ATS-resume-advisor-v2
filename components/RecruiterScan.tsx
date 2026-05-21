@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { loadSession, patchSession } from "@/lib/storage";
 import type { RecruiterScan } from "@/lib/types";
 
 type ScanVerdict = "ADVANCE" | "REJECT" | "MAYBE";
@@ -38,6 +39,15 @@ export function RecruiterScanSection({ resumeText }: { resumeText: string }) {
   const [scan, setScan] = useState<RecruiterScan | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  useEffect(() => {
+    const s = loadSession();
+    if (s.recruiterScan && !scan) {
+      setScan(s.recruiterScan);
+      setStatus("done");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function runScan() {
     setStatus("loading");
     setErrorMsg(null);
@@ -52,6 +62,7 @@ export function RecruiterScanSection({ resumeText }: { resumeText: string }) {
         throw new Error(data.error ?? `Request failed (${res.status}).`);
       }
       setScan(data.scan);
+      patchSession({ recruiterScan: data.scan });
       setStatus("done");
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "An error occurred.");

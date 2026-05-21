@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CopyButton } from "@/components/CopyButton";
+import { loadSession, patchSession } from "@/lib/storage";
 import type { CoverLetterOutput } from "@/lib/types";
 
 interface RoleProps {
@@ -82,6 +83,15 @@ export function CoverLetterSection(props: Props) {
   const [docxBusy, setDocxBusy] = useState(false);
   const [docxErr, setDocxErr] = useState<string | null>(null);
 
+  useEffect(() => {
+    const s = loadSession();
+    if (s.coverLetter && !output) {
+      setOutput(s.coverLetter);
+      setStatus("done");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function generate() {
     setStatus("loading");
     setErrorMsg(null);
@@ -117,6 +127,7 @@ export function CoverLetterSection(props: Props) {
         throw new Error(data.error ?? `Request failed (${res.status}).`);
       }
       setOutput(data.coverLetter);
+      patchSession({ coverLetter: data.coverLetter });
       setStatus("done");
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : "An error occurred.");

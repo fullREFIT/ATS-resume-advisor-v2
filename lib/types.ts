@@ -142,6 +142,8 @@ export interface SessionState {
   tailored?: TailoredOutput;
   companyTailored?: CompanyTailoredOutput;
   targetPersons?: TargetPersonsResponse;
+  coverLetter?: CoverLetterOutput;
+  recruiterScan?: RecruiterScan;
 
   updatedAt: number;
 }
@@ -168,6 +170,17 @@ export interface GapCloserPlan {
   structuralGaps: string[];
   projectedScoreAfter90Days: number;
   projectedVerdict: "GO" | "FIX_FIRST";
+}
+
+// v4-T2 — Job URL Paste
+export interface FetchJdResponse {
+  success: boolean;
+  jdText?: string;
+  jobTitle?: string;
+  company?: string;
+  confidence?: "high" | "medium" | "low";
+  error?: string;
+  message?: string;
 }
 
 // T1 — 6-Second Recruiter Scan
