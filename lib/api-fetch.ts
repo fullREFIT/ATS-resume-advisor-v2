@@ -58,7 +58,7 @@ export async function callApi<TBody, TResp>({
       /FUNCTION_INVOCATION_TIMEOUT|timed? ?out/i.test(rawText)
     ) {
       throw new Error(
-        "The model took too long to respond (over 60 seconds). This usually happens with very long intake answers. Try shortening your longest answer, or press Generate again — the second attempt often succeeds.",
+        "The model took too long to respond. This is unusual — press Generate again. If it fails a second time, try shortening your longest intake answer.",
       );
     }
     if (res.status === 413) {

@@ -5,7 +5,7 @@ import { consumeQuota, rateLimitWarning } from "@/lib/ratelimit";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const MAX_INPUT_CHARS = 30000;
 
