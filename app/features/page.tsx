@@ -39,7 +39,79 @@ type Feature = {
   detail?: string;
   badge?: { label: string; color: string };
   mode?: "role" | "company" | "both";
+  isNew?: boolean;
 };
+
+const RECENT_FEATURES: Feature[] = [
+  {
+    tag: "Just shipped",
+    title: "See exactly what changed",
+    body: "A toggle above your tailored resume shows you what's different from your original — word by word. Words added are in green. Words removed are in red strikethrough. Unchanged words are dimmed. You see for yourself that nothing was invented — every change traces to evidence you provided.",
+    detail: "Builds trust by making the AI's work visible.",
+    isNew: true,
+  },
+  {
+    tag: "Just shipped",
+    title: "Paste a job link instead of typing",
+    body: "Don't want to copy and paste a long job description? Paste a link from LinkedIn, Indeed, Glassdoor, Greenhouse, Lever, Workday, or most company career pages. The app pulls the job description for you. Cuts the start of a diagnosis from about a minute down to about fifteen seconds.",
+    detail: "Works on most career pages. LinkedIn often blocks scrapers — in that case it tells you to paste the text directly.",
+    isNew: true,
+  },
+  {
+    tag: "Just shipped",
+    title: "Everything-you-need ZIP download",
+    body: "When you're ready to apply, click one button and download a single ZIP file with everything: your tailored resume, your cover letter, an interview prep guide, and a one-page cheat sheet that shows your match score, top matches, gaps to address, keywords to use, likely interview questions, and STAR stories to prepare.",
+    detail: "One click. Four files. Ready to send.",
+    isNew: true,
+  },
+];
+
+const RECENT_IMPROVEMENTS: { title: string; body: string }[] = [
+  {
+    title: "Gap Closer plan now works every time",
+    body: "The 30/60/90-day plan that appears when your verdict is FIX FIRST or PASS was failing on every run. It's fixed now — you'll always get a real plan with specific certifications, projects, and time estimates.",
+  },
+  {
+    title: "Verdict badge fits on small phones",
+    body: "On iPhone SE and similar narrow phones, the verdict label was running off the side of the page. It now wraps cleanly to two lines on small screens — desktop view is unchanged.",
+  },
+  {
+    title: "\"Who to send this to\" suggestions are more reliable",
+    body: "In company mode, the panel that suggests specific people to reach out to was sometimes returning empty or broken results. Now it consistently surfaces three to five real role archetypes you can search for on LinkedIn.",
+  },
+  {
+    title: "Resume diff toggle fits on small phones",
+    body: "The \"Tailored Resume / View Changes\" buttons above your resume were spilling off the side of small screens. They now wrap to a second line when there's not enough room.",
+  },
+  {
+    title: "\"How it works\" link goes to the right place",
+    body: "Clicking \"How it works\" in the top navigation used to send you to a separate page. It now scrolls you straight to the explanation on the home page, where you'd expect.",
+  },
+  {
+    title: "Only three intake questions required (not five)",
+    body: "Before generating your tailored resume, you used to have to answer all five intake questions. Now only three are required — questions four and five are clearly labeled as optional. A small status line tells you how many you've answered.",
+  },
+  {
+    title: "Helpful hint when your job description is too short",
+    body: "If you paste a job description that's under 50 characters, the form now tells you to add more — the same hint the resume field already shows. Before, the button was just disabled silently.",
+  },
+  {
+    title: "\"Confidence\" label added to company analysis",
+    body: "In company mode, the short note about how confident the analysis is now has a clear \"Confidence:\" label, so you know what you're reading.",
+  },
+  {
+    title: "Smarter job posting detection",
+    body: "When you paste a job URL, the app now does a better job of detecting the role title and company name. It looks at the page title and headline tags as a backup when the posting doesn't include all the structured data it would prefer.",
+  },
+  {
+    title: "Clearer error messages",
+    body: "If something goes wrong on our end — for example the AI taking too long to respond — you now get a plain-English message explaining what to do, instead of a cryptic error code.",
+  },
+  {
+    title: "More time for long, detailed answers",
+    body: "The app now allows up to five minutes for the AI to finish writing your tailored resume or cover letter when you've provided long, detailed intake answers. Long answers no longer cause silent timeouts.",
+  },
+];
 
 const ROLE_FEATURES: Feature[] = [
   {
@@ -140,16 +212,40 @@ function FeatureCard({ feature }: { feature: Feature }) {
   return (
     <div
       style={{
-        background: T.card,
-        border: `1px solid ${T.border}`,
+        background: feature.isNew
+          ? "linear-gradient(180deg, rgba(74,222,128,0.06) 0%, " + T.card + " 100%)"
+          : T.card,
+        border: `1px solid ${feature.isNew ? T.green : T.border}`,
         borderRadius: 12,
         padding: "24px 28px",
         display: "flex",
         flexDirection: "column",
         gap: 12,
+        position: "relative",
       }}
     >
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+      {feature.isNew && (
+        <span
+          style={{
+            position: "absolute",
+            top: 16,
+            right: 16,
+            padding: "4px 10px",
+            background: "#14532d",
+            color: T.green,
+            border: `1px solid ${T.green}`,
+            borderRadius: 4,
+            fontSize: 10,
+            letterSpacing: "0.14em",
+            fontWeight: 700,
+            textTransform: "uppercase",
+            ...ls("mono"),
+          }}
+        >
+          New — Last 48h
+        </span>
+      )}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", paddingRight: feature.isNew ? 120 : 0 }}>
         <span
           style={{
             fontSize: 11,
@@ -309,6 +405,28 @@ export default function FeaturesPage() {
         </Link>
       </section>
 
+      {/* RECENTLY SHIPPED — last 48 hours */}
+      <section style={{ padding: "72px 24px", background: T.bgAlt, borderTop: `1px solid ${T.border}` }}>
+        <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          <SectionHeader
+            tag="What's new — last 48 hours"
+            title="Three new features just landed."
+            body="The app has grown a lot in the last two days. Here's what just shipped — plus a list of improvements further down the page."
+          />
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+              gap: 20,
+            }}
+          >
+            {RECENT_FEATURES.map((f) => (
+              <FeatureCard key={f.title} feature={f} />
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ROLE MODE */}
       <section style={{ padding: "72px 24px", background: T.bgAlt, borderTop: `1px solid ${T.border}` }}>
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
@@ -374,8 +492,63 @@ export default function FeaturesPage() {
         </div>
       </section>
 
-      {/* QUICK COMPARISON */}
+      {/* RECENT IMPROVEMENTS — last 48 hours, plain English */}
       <section style={{ padding: "72px 24px", background: T.bg, borderTop: `1px solid ${T.border}` }}>
+        <div style={{ maxWidth: 820, margin: "0 auto" }}>
+          <SectionHeader
+            tag="Recent improvements"
+            title="Eleven smaller changes from the last two days."
+            body="A round of testing across three different browsers turned up a list of small things to polish. Each one is fixed."
+          />
+          <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+            {RECENT_IMPROVEMENTS.map((item) => (
+              <div
+                key={item.title}
+                style={{
+                  background: T.card,
+                  border: `1px solid ${T.border}`,
+                  borderRadius: 10,
+                  padding: "18px 22px",
+                  display: "grid",
+                  gridTemplateColumns: "auto 1fr",
+                  gap: 14,
+                  alignItems: "start",
+                }}
+              >
+                <span
+                  aria-hidden
+                  style={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: "50%",
+                    background: T.green,
+                    marginTop: 8,
+                  }}
+                />
+                <div>
+                  <p
+                    style={{
+                      fontSize: 15,
+                      fontWeight: 700,
+                      color: T.light,
+                      ...ls("sans"),
+                      marginBottom: 4,
+                    }}
+                  >
+                    {item.title}
+                  </p>
+                  <p style={{ fontSize: 14, lineHeight: 1.65, color: T.muted }}>
+                    {item.body}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* QUICK COMPARISON */}
+      <section style={{ padding: "72px 24px", background: T.bgAlt, borderTop: `1px solid ${T.border}` }}>
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <span
             style={{
@@ -408,6 +581,9 @@ export default function FeaturesPage() {
               ["Four-component score breakdown", T.green],
               ["Gap Closer 30/60/90-day action plan", T.green],
               ["Tailored resume — all roles preserved", T.green],
+              ["See-what-changed diff view (NEW)", T.green],
+              ["Paste a job link instead of typing (NEW)", T.green],
+              ["One-click application package ZIP (NEW)", T.green],
               ["ATS-safe .docx export", T.green],
               ["JD keywords — integrated and missed", T.green],
               ["Cover letter generator + .docx export", T.green],
