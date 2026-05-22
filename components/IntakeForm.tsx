@@ -383,6 +383,11 @@ export function IntakeForm() {
               className={`min-h-[180px] ${INPUT_CLASS}`}
             />
           )}
+          {hydrated && jdInputMode === "text" && jd.trim().length > 0 && jd.trim().length < 50 && (
+            <p className="text-xs text-[#a8a29e]">
+              Add more — at least 50 characters of job description.
+            </p>
+          )}
         </div>
       ) : (
         <>

@@ -37,7 +37,7 @@ export function LandingNav() {
             Features
           </Link>
           <Link
-            href="/about"
+            href="/#how-it-works"
             className="text-sm font-medium text-[#a8a29e] transition-colors hover:text-[#e8e4de]"
             style={{ fontFamily: "var(--ls-sans), sans-serif" }}
           >

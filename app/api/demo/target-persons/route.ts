@@ -120,6 +120,7 @@ Produce 3-5 target-person archetypes per the schema.`;
     });
     const parsed = parseJson<TargetPersonsResponse>(text);
     if (!parsed || !Array.isArray(parsed.archetypes)) {
+      console.error("[target-persons] Failed to parse model output. Raw text:", text);
       return NextResponse.json(
         { error: "Model returned unparseable response." },
         { status: 502 },

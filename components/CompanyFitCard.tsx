@@ -8,7 +8,14 @@ export function CompanyFitCard({ fit }: { fit: CompanyFit }) {
         <h2 className="text-2xl font-semibold tracking-tight text-[#e8e4de]">
           {fit.companyName || "Unknown"}
         </h2>
-        <p className="mt-3 text-xs text-[#a8a29e]">{fit.confidenceNote}</p>
+        {fit.confidenceNote && (
+          <p className="mt-3 text-xs text-[#a8a29e]">
+            <span className="font-mono uppercase tracking-[0.08em] text-[#4ade80]">
+              Confidence:
+            </span>{" "}
+            {fit.confidenceNote}
+          </p>
+        )}
       </section>
 
       <section className="card-surface">

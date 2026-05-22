@@ -347,6 +347,39 @@ export async function POST(req: Request) {
 
   jdText = removeBoilerplate(jdText);
 
+  if (!jobTitle) {
+    const ogTitle = html.match(
+      /<meta[^>]+property=["']og:title["'][^>]+content=["']([^"']+)["']/i,
+    )?.[1];
+    const h1 = html.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)?.[1];
+    const pageTitle = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1];
+    const candidate = ogTitle ?? h1 ?? pageTitle ?? "";
+    if (candidate) {
+      const cleaned = stripHtml(candidate).split(/\s+[-|–—•]\s+/)[0].trim();
+      if (cleaned.length > 0 && cleaned.length <= 200) {
+        jobTitle = cleaned;
+      }
+    }
+  }
+
+  if (!company) {
+    const ogSite = html.match(
+      /<meta[^>]+property=["']og:site_name["'][^>]+content=["']([^"']+)["']/i,
+    )?.[1];
+    if (ogSite) {
+      company = stripHtml(ogSite).trim();
+    } else {
+      const pageTitle = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1];
+      if (pageTitle) {
+        const parts = stripHtml(pageTitle).split(/\s+[-|–—•]\s+/);
+        if (parts.length > 1) {
+          const last = parts[parts.length - 1].trim();
+          if (last.length > 0 && last.length <= 100) company = last;
+        }
+      }
+    }
+  }
+
   if (jdText.length < 50) {
     const resp: FetchJdResponse = {
       success: false,

@@ -271,15 +271,17 @@ Sales Nav hint:
 - Format: \`Sales Navigator → Lead Filters → Current company = <name>, Function = <function>, Seniority = <range>\`
 - Pick the right Function and Seniority for the archetype.
 
-Return STRICT JSON only, no commentary, no markdown fences:
+Return STRICT JSON only, no commentary, no markdown fences. The linkedinSearchString field MUST contain escaped double quotes (\\") around the role title and company name — produce literal escaped quotes inside the JSON string value.
+
+Example of the literal output shape — produce JSON with the same structure, populated with archetypes specific to this candidate and company:
 {
   "archetypes": [
     {
-      "roleTitle": "<specific job title>",
-      "whyThisRole": "<1-2 sentences connecting candidate experience to this role's responsibilities>",
-      "openingLine": "<1-2 sentences, first-person, references at most one companyHooksUsed element>",
-      "linkedinSearchString": "<\\"role title\\" \\"company name\\" site:linkedin.com/in>",
-      "salesNavSearchHint": "<Sales Navigator filter hint>"
+      "roleTitle": "VP Customer Success",
+      "whyThisRole": "Your 5 years scaling CS teams from 3 to 12 ICs maps directly to their VP-level need to operationalize CS at growth-stage scale, which their site cites as a focus area.",
+      "openingLine": "I noticed Gong serves customer success teams at over 4,000 B2B companies — I spent the last three years building the CS motion at a similar-stage SaaS company and would love to compare notes.",
+      "linkedinSearchString": "\"VP Customer Success\" \"Gong\" site:linkedin.com/in",
+      "salesNavSearchHint": "Sales Navigator → Lead Filters → Current company = Gong, Function = Customer Success, Seniority = VP"
     }
   ]
 }`;

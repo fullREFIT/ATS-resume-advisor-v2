@@ -61,7 +61,7 @@ export function ResumeDiff({
       <div
         role="tablist"
         aria-label="Resume view mode"
-        className="flex gap-2"
+        className="flex flex-wrap gap-2"
       >
         <button
           type="button"

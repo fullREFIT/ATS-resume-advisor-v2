@@ -61,9 +61,11 @@ export function RefinePageClient() {
     return <p className="text-sm text-[#a8a29e]">Loading your intake…</p>;
   }
 
-  const allAnswered = questions.every(
+  const MIN_REQUIRED = 3;
+  const filledCount = questions.filter(
     (q) => (answers[q.id] ?? "").trim().length >= MIN_ANSWER_LEN,
-  );
+  ).length;
+  const canGenerate = filledCount >= Math.min(MIN_REQUIRED, questions.length);
 
   function updateAnswer(id: string, value: string) {
     const next = { ...answers, [id]: value };
@@ -72,7 +74,7 @@ export function RefinePageClient() {
   }
 
   async function onGenerate() {
-    if (!allAnswered) return;
+    if (!canGenerate) return;
     setLoading(true);
     setError(null);
     try {
@@ -165,6 +167,11 @@ export function RefinePageClient() {
                       Category:
                     </span>{" "}
                     {q.category} · {q.why}
+                    {i >= MIN_REQUIRED && (
+                      <span className="ml-2 font-mono uppercase tracking-[0.08em] text-[#78716c]">
+                        · optional
+                      </span>
+                    )}
                   </p>
                 </div>
               </div>
@@ -193,10 +200,17 @@ export function RefinePageClient() {
         </p>
       )}
 
+      <p className="text-xs text-[#a8a29e]">
+        {filledCount} of {questions.length} answered ·{" "}
+        {canGenerate
+          ? "ready to generate"
+          : `${Math.min(MIN_REQUIRED, questions.length) - filledCount} more required`}
+      </p>
+
       <div className="flex flex-col gap-3 sm:flex-row">
         <Button
           onClick={onGenerate}
-          disabled={!allAnswered || loading}
+          disabled={!canGenerate || loading}
           fullWidth
         >
           {loading
