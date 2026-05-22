@@ -66,10 +66,11 @@ The candidate's verdict is ${diagnosis.verdict} with a match score of ${diagnosi
       task: "diagnosis",
       system: GAP_CLOSER_SYSTEM,
       user: userPrompt,
-      maxTokens: 2000,
+      maxTokens: 3000,
     });
     const plan = parseJson<GapCloserPlan>(text);
     if (!plan) {
+      console.error("[gap-closer] Failed to parse model output. Raw text:", text);
       return NextResponse.json(
         { error: "Failed to parse gap closer plan." },
         { status: 500 },

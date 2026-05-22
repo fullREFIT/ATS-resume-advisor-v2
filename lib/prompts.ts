@@ -314,20 +314,34 @@ Rules:
 - Include networking actions where relevant (e.g., "Join [specific community] and contribute to 2 discussions per week").
 - Estimate the score improvement each action could produce. Be conservative.
 
-Return STRICT JSON only, no fences:
+Return STRICT JSON only, no fences, no prose before or after.
+
+Required fields:
+- thirtyDays, sixtyDays, ninetyDays: arrays of action objects
+- structuralGaps: array of strings (use [] if none)
+- projectedScoreAfter90Days: a number (integer 0-100), NOT a string
+- projectedVerdict: exactly one of the two strings "GO" or "FIX_FIRST"
+
+Each action object MUST have exactly these four fields:
+- action: string
+- why: string
+- estimatedScoreImpact: string (e.g., "+3-5 on keywordMatch")
+- resource: string or null
+
+Example of the literal output shape — produce JSON with the same structure, populated with content specific to this candidate's gaps:
 {
   "thirtyDays": [
-    {"action": "<specific action>", "why": "<which gap this addresses>", "estimatedScoreImpact": "<e.g., +3-5 on keywordMatch>", "resource": "<URL or specific name, or null>"}
+    {"action": "Complete the Google Data Analytics Certificate (Coursera, free audit, 40 hours)", "why": "Closes the SQL/analytics gap flagged in keywordMatch", "estimatedScoreImpact": "+4-6 on keywordMatch", "resource": "https://www.coursera.org/professional-certificates/google-data-analytics"}
   ],
   "sixtyDays": [
-    {"action": "...", "why": "...", "estimatedScoreImpact": "...", "resource": "..."}
+    {"action": "Ship a portfolio dashboard built with the certificate skills, published on GitHub Pages", "why": "Demonstrates applied skills in 60 days", "estimatedScoreImpact": "+3-5 on experienceRelevance", "resource": null}
   ],
   "ninetyDays": [
-    {"action": "...", "why": "...", "estimatedScoreImpact": "...", "resource": "..."}
+    {"action": "Contribute one analytics article to a recognized industry publication", "why": "Builds external credibility in the target domain", "estimatedScoreImpact": "+2-3 on trajectoryFit", "resource": "https://towardsdatascience.com"}
   ],
-  "structuralGaps": ["<gaps that can't be closed with coursework — e.g., 'This role requires 5+ years of people management; your resume shows 1 year. This requires time, not a certificate.'>"],
-  "projectedScoreAfter90Days": "<integer estimate if all actions completed>",
-  "projectedVerdict": "GO" | "FIX_FIRST"
+  "structuralGaps": ["The role requires 5+ years of people management; your resume shows 1 year. This requires time, not a certificate."],
+  "projectedScoreAfter90Days": 82,
+  "projectedVerdict": "GO"
 }`;
 
 export const RECRUITER_SCAN_SYSTEM = `You are an experienced technical recruiter who has reviewed 10,000+ resumes. You are simulating your actual reading behavior when you open a resume for the first time.

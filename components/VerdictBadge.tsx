@@ -33,7 +33,11 @@ export function VerdictBadge({ verdict }: { verdict: Verdict }) {
         fontFamily: "var(--ls-mono, ui-monospace, monospace)",
         background: s.background,
         color: s.color,
-        whiteSpace: "nowrap",
+        whiteSpace: "normal",
+        maxWidth: "100%",
+        wordBreak: "normal",
+        overflowWrap: "anywhere",
+        lineHeight: 1.4,
       }}
     >
       {LABELS[verdict]}
