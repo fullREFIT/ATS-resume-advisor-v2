@@ -42,30 +42,6 @@ type Feature = {
   isNew?: boolean;
 };
 
-const RECENT_FEATURES: Feature[] = [
-  {
-    tag: "Just shipped",
-    title: "See exactly what changed",
-    body: "A toggle above your tailored resume shows you what's different from your original — word by word. Words added are in green. Words removed are in red strikethrough. Unchanged words are dimmed. You see for yourself that nothing was invented — every change traces to evidence you provided.",
-    detail: "Builds trust by making the AI's work visible.",
-    isNew: true,
-  },
-  {
-    tag: "Just shipped",
-    title: "Paste a job link instead of typing",
-    body: "Don't want to copy and paste a long job description? Paste a link from LinkedIn, Indeed, Glassdoor, Greenhouse, Lever, Workday, or most company career pages. The app pulls the job description for you. Cuts the start of a diagnosis from about a minute down to about fifteen seconds.",
-    detail: "Works on most career pages. LinkedIn often blocks scrapers — in that case it tells you to paste the text directly.",
-    isNew: true,
-  },
-  {
-    tag: "Just shipped",
-    title: "Everything-you-need ZIP download",
-    body: "When you're ready to apply, click one button and download a single ZIP file with everything: your tailored resume, your cover letter, an interview prep guide, and a one-page cheat sheet that shows your match score, top matches, gaps to address, keywords to use, likely interview questions, and STAR stories to prepare.",
-    detail: "One click. Four files. Ready to send.",
-    isNew: true,
-  },
-];
-
 const RECENT_IMPROVEMENTS: { title: string; body: string }[] = [
   {
     title: "Gap Closer plan now works every time",
@@ -115,77 +91,116 @@ const RECENT_IMPROVEMENTS: { title: string; body: string }[] = [
 
 const ROLE_FEATURES: Feature[] = [
   {
-    tag: "Step 2",
+    tag: "Diagnosis",
     title: "Honest Match Diagnosis",
     body: "A 0–100 match score broken into four real dimensions: keyword match, experience relevance, trajectory fit, and ATS parsing quality. Then a single verdict — GO, FIX FIRST, or PASS — with a plain-English explanation of what drove it.",
     detail: "This is the only tool that will tell you not to apply.",
     badge: { label: "GO / FIX FIRST / PASS", color: T.green },
   },
   {
-    tag: "Step 2",
+    tag: "Action plan",
     title: "Gap Closer Action Plan",
     body: "When your verdict is FIX FIRST or PASS, a 30/60/90-day timeline appears automatically. Each column has specific, actionable items — certifications to earn, projects to build, experience gaps to close — so you know exactly what would flip the verdict.",
     detail: "Only available in role mode. Includes structural gaps flagged separately below the timeline.",
     badge: { label: "Auto-loads on FIX FIRST + PASS", color: T.amber },
   },
   {
-    tag: "Step 4",
+    tag: "Quick start",
+    title: "Paste a job link instead of typing",
+    body: "Don't want to copy and paste a long job description? Paste a link from LinkedIn, Indeed, Glassdoor, Greenhouse, Lever, Workday, or most company career pages. The app pulls the description for you.",
+    detail: "Cuts the start of a diagnosis from about a minute to about fifteen seconds.",
+    isNew: true,
+  },
+  {
+    tag: "Resume",
     title: "Tailored Resume",
     body: "Your experience rewritten using exact language from the job description — pulled from your actual intake answers, never invented. Every role is preserved with original dates, company names, and titles. Nothing flattened.",
   },
   {
-    tag: "Step 4",
-    title: "ATS-Safe .docx Export",
-    body: "One-click download of a Word document in the format every ATS parses cleanly: single column, Calibri 11pt, left-aligned, standard section headings, no tables, no graphics, 1-inch margins.",
-    detail: "The format most resume tools won't bother enforcing.",
+    tag: "Transparency",
+    title: "See exactly what changed",
+    body: "A toggle above your tailored resume shows what's different from your original, word by word. Added words appear in green. Removed words appear in red strikethrough. Unchanged words are dimmed so changes stand out.",
+    detail: "Builds trust by making the AI's work visible — every change traces to evidence you provided.",
+    isNew: true,
   },
   {
-    tag: "Step 4",
+    tag: "Insights",
     title: "JD Keywords — Integrated and Missed",
     body: "Exact phrases from the job description that made it into your resume are listed as green tags. Keywords that couldn't be supported by your evidence are listed separately in amber — with an explanation of why stuffing them anyway would hurt you.",
   },
   {
-    tag: "Step 4",
+    tag: "Cover letter",
     title: "Cover Letter Generator",
     body: "A 250–350 word cover letter grounded in your resume and intake answers. Uses Claude Sonnet for generation and a separate Haiku call for fabrication checking. No banned openers. Downloads as a separate .docx.",
     badge: { label: "Fact-checked, 1 retry max", color: T.muted },
   },
   {
-    tag: "Step 4",
+    tag: "Simulation",
     title: "6-Second Recruiter Scan",
     body: "A fast, honest simulation of what a recruiter sees in the first six seconds. Returns ADVANCE, REJECT, or MAYBE with a brief explanation. Runs on demand after your resume is generated.",
     badge: { label: "ADVANCE / REJECT / MAYBE", color: T.green },
   },
   {
-    tag: "Step 4",
+    tag: "Coaching",
     title: "Interview Prep",
     body: "Likely interview questions based on your resume and the role. Per-question STAR story guidance, including which gaps you should prepare to address. Generated from the same evidence base as your tailored resume.",
   },
   {
-    tag: "Step 4",
+    tag: "Download",
+    title: "ATS-Safe .docx Export",
+    body: "One-click download of a Word document in the format every ATS parses cleanly: single column, Calibri 11pt, left-aligned, standard section headings, no tables, no graphics, 1-inch margins.",
+    detail: "The format most resume tools won't bother enforcing.",
+  },
+  {
+    tag: "Shareable",
     title: "Shareable Score Report",
-    body: "Download a 1200×630 PNG image of your verdict, match score, and component score bars. Also copies to clipboard for sharing. Built with Canvas 2D — no external library.",
+    body: "Download a 1200×630 PNG image of your verdict, match score, and component score bars. Also copies to clipboard for sharing.",
     badge: { label: "PNG + clipboard", color: T.muted },
+  },
+  {
+    tag: "All-in-one",
+    title: "Application Package ZIP",
+    body: "When you're ready to apply, click one button and download a single ZIP file with everything: your tailored resume, your cover letter, an interview prep guide, and a one-page cheat sheet covering your match score, top matches, gaps, keywords to use, likely interview questions, and STAR stories to prepare.",
+    detail: "Four files, one click.",
+    isNew: true,
   },
 ];
 
 const COMPANY_FEATURES: Feature[] = [
   {
-    tag: "Step 2",
+    tag: "Diagnosis",
     title: "Company Fit Diagnosis",
     body: "Paste a company URL. Resume Verdict reads the site, maps your background against what they do and value, and tells you where you're strong, where you're weak, and what a realistic pitch looks like.",
     detail: "No job posting required. Grounded in what they actually said about themselves.",
   },
   {
-    tag: "Step 4",
+    tag: "Outreach",
     title: "Cold Outreach Kit",
     body: "A tailored resume positioned for cold outreach, plus a specific positioning angle and a draft message ready to send. Every company-specific claim in the message references something from their site.",
   },
   {
-    tag: "Step 4",
+    tag: "Contacts",
     title: "Target Persons Panel",
-    body: "Three archetype cards describing who at this company you should actually reach out to — titles, what motivates them, what problems they're likely solving. Helps you target the right person instead of sending to a generic inbox.",
+    body: "Three to five archetype cards describing who at this company you should actually reach out to — titles, what motivates them, what problems they're likely solving. Includes a copy-pastable Google search string and a Sales Navigator filter hint per archetype.",
     badge: { label: "On demand", color: T.muted },
+  },
+  {
+    tag: "Cover letter",
+    title: "Cover Letter Generator (company mode)",
+    body: "Available in company mode too. Generates a 250–350 word letter grounded in the company's site content and your intake answers — using the same fabrication-guard pipeline. No banned openers.",
+    badge: { label: "Fact-checked, 1 retry max", color: T.muted },
+  },
+  {
+    tag: "Simulation",
+    title: "6-Second Recruiter Scan (company mode)",
+    body: "Also available in company mode. Simulates how a recruiter at this specific company would scan the resume you've just tailored for them.",
+    badge: { label: "ADVANCE / REJECT / MAYBE", color: T.green },
+  },
+  {
+    tag: "All-in-one",
+    title: "Application Package ZIP (company mode)",
+    body: "The same one-click ZIP download works in company mode. Contents adapt to include the cold-outreach draft and target-persons summary in the cheat sheet.",
+    isNew: true,
   },
 ];
 
@@ -378,12 +393,13 @@ export default function FeaturesPage() {
             maxWidth: 720,
           }}
         >
-          Two modes. A dozen features.{" "}
+          Two modes. Every feature you need.{" "}
           <em style={{ color: T.green, fontStyle: "italic" }}>All free.</em>
         </h1>
         <p style={{ fontSize: 18, lineHeight: 1.7, color: T.muted, maxWidth: 600, marginBottom: 36 }}>
           Resume Verdict runs top to bottom in about ten minutes. Here&apos;s exactly
           what you get — from the initial diagnosis to the file you download and submit.
+          Features added in the last 48 hours are marked with a green NEW badge.
         </p>
         <Link
           href="/start"
@@ -403,28 +419,6 @@ export default function FeaturesPage() {
         >
           100% free - no signup →
         </Link>
-      </section>
-
-      {/* RECENTLY SHIPPED — last 48 hours */}
-      <section style={{ padding: "72px 24px", background: T.bgAlt, borderTop: `1px solid ${T.border}` }}>
-        <div style={{ maxWidth: 960, margin: "0 auto" }}>
-          <SectionHeader
-            tag="What's new — last 48 hours"
-            title="Three new features just landed."
-            body="The app has grown a lot in the last two days. Here's what just shipped — plus a list of improvements further down the page."
-          />
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-              gap: 20,
-            }}
-          >
-            {RECENT_FEATURES.map((f) => (
-              <FeatureCard key={f.title} feature={f} />
-            ))}
-          </div>
-        </div>
       </section>
 
       {/* ROLE MODE */}
@@ -580,16 +574,16 @@ export default function FeaturesPage() {
               ["Resume diagnosis (match score + verdict)", T.green],
               ["Four-component score breakdown", T.green],
               ["Gap Closer 30/60/90-day action plan", T.green],
-              ["Tailored resume — all roles preserved", T.green],
-              ["See-what-changed diff view (NEW)", T.green],
               ["Paste a job link instead of typing (NEW)", T.green],
-              ["One-click application package ZIP (NEW)", T.green],
+              ["Tailored resume — all roles preserved", T.green],
+              ["See exactly what changed — diff view (NEW)", T.green],
               ["ATS-safe .docx export", T.green],
               ["JD keywords — integrated and missed", T.green],
               ["Cover letter generator + .docx export", T.green],
               ["6-second recruiter scan (ADVANCE/REJECT/MAYBE)", T.green],
               ["Interview prep with STAR story guidance", T.green],
               ["Shareable score report PNG", T.green],
+              ["One-click application package ZIP (NEW)", T.green],
               ["Company targeting mode (cold outreach kit)", T.green],
               ["Target persons panel (who to contact)", T.green],
               ["Resume version history (last 20 runs)", T.green],
