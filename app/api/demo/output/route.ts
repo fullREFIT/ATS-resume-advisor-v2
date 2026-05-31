@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
-import { classifyError } from "@/lib/claude";
+import { classifyError, getProviderApiKey } from "@/lib/claude";
 import { runOutputFlow } from "@/lib/output-flow";
-import { consumeQuota, rateLimitWarning } from "@/lib/ratelimit";
+import { consumeQuota, rateLimitWarning, consumeQuotaUnlessByok, consumeBudget, consumeBudgetUnlessByok, estimateRequestCost, budgetExhaustedMessage } from "@/lib/ratelimit";
+import { extractByokKey } from "@/lib/byok-helpers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,7 +11,8 @@ export const maxDuration = 300;
 const MAX_INPUT_CHARS = 30000;
 
 export async function POST(req: Request) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const byokKey = extractByokKey(req);
+  const apiKey = byokKey ?? getProviderApiKey();
   if (!apiKey) {
     return NextResponse.json(
       { error: "Server is not configured." },
@@ -18,11 +20,19 @@ export async function POST(req: Request) {
     );
   }
 
-  const quota = await consumeQuota(req);
+  const quota = await consumeQuotaUnlessByok(req, byokKey);
   if (!quota.allowed) {
     return NextResponse.json(
       { error: "Daily limit reached.", rateLimit: quota },
       { status: 429 },
+    );
+  }
+
+  const budget = await consumeBudgetUnlessByok(byokKey, estimateRequestCost("output"));
+  if (!budget.allowed) {
+    return NextResponse.json(
+      { error: budgetExhaustedMessage(), budget },
+      { status: 503 },
     );
   }
 
@@ -58,6 +68,7 @@ export async function POST(req: Request) {
   try {
     const result = await runOutputFlow({
       apiKey,
+      providerOverride: byokKey ? "anthropic" : undefined,
       resume,
       jd,
       intakeAnswers,

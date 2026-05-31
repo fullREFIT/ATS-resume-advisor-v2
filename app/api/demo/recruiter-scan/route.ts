@@ -1,15 +1,17 @@
 import { NextResponse } from "next/server";
-import { callClaude, classifyError, parseJson } from "@/lib/claude";
+import { callClaude, classifyError, parseJson, getProviderApiKey } from "@/lib/claude";
 import { RECRUITER_SCAN_SYSTEM } from "@/lib/prompts";
-import { consumeQuota } from "@/lib/ratelimit";
+import { consumeQuota, consumeQuotaUnlessByok, consumeBudget, consumeBudgetUnlessByok, estimateRequestCost, budgetExhaustedMessage } from "@/lib/ratelimit";
 import type { RecruiterScan } from "@/lib/types";
+import { extractByokKey } from "@/lib/byok-helpers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 export async function POST(req: Request) {
-  const quota = await consumeQuota(req);
+  const byokKey = extractByokKey(req);
+  const quota = await consumeQuotaUnlessByok(req, byokKey);
   if (!quota.allowed) {
     return NextResponse.json(
       { error: "Daily limit reached. Try again tomorrow." },
@@ -17,7 +19,15 @@ export async function POST(req: Request) {
     );
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const budget = await consumeBudgetUnlessByok(byokKey, estimateRequestCost("fabrication_guard"));
+  if (!budget.allowed) {
+    return NextResponse.json(
+      { error: budgetExhaustedMessage(), budget },
+      { status: 503 },
+    );
+  }
+
+  const apiKey = byokKey ?? getProviderApiKey();
   if (!apiKey) {
     return NextResponse.json(
       { error: "API key not configured." },
@@ -43,6 +53,7 @@ export async function POST(req: Request) {
   try {
     const text = await callClaude({
       apiKey,
+      providerOverride: byokKey ? "anthropic" : undefined,
       task: "diagnosis",
       system: RECRUITER_SCAN_SYSTEM,
       user: `Here is the tailored resume to scan:\n\n"""\n${resumeText}\n"""`,

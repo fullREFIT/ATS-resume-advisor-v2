@@ -1,4 +1,4 @@
-import { callClaude, parseJson } from "./claude";
+import { callClaude, parseJson, type ModelProvider } from "./claude";
 import {
   COMPANY_FACT_CHECK_SYSTEM,
   COMPANY_OUTPUT_SYSTEM,
@@ -27,6 +27,7 @@ export interface RunCompanyOutputFlowArgs {
   companyUrl: string;
   desiredRole?: string;
   intakeAnswers: { question: string; answer: string }[];
+  providerOverride?: ModelProvider;
 }
 
 const MAX_RETRIES = 1;
@@ -105,6 +106,7 @@ export async function runCompanyOutputFlow(
   while (attempt <= MAX_RETRIES) {
     const text = await callClaude({
       apiKey: args.apiKey,
+      providerOverride: args.providerOverride,
       task: "output",
       system: COMPANY_OUTPUT_SYSTEM,
       user: buildUserPrompt(args, {
@@ -120,6 +122,7 @@ export async function runCompanyOutputFlow(
     const flat = flattenBullets(parsed);
     const bulletGuardText = await callClaude({
       apiKey: args.apiKey,
+      providerOverride: args.providerOverride,
       task: "fabrication_guard",
       system: FABRICATION_GUARD_SYSTEM,
       user: `Original resume:
@@ -145,6 +148,7 @@ Return STRICT JSON only.`,
     // Company fact-check against scraped content
     const companyGuardText = await callClaude({
       apiKey: args.apiKey,
+      providerOverride: args.providerOverride,
       task: "fabrication_guard",
       system: COMPANY_FACT_CHECK_SYSTEM,
       user: `Company website content (the ONLY allowed source for company claims):

@@ -1,0 +1,614 @@
+commit 9cdca0beb69a77da1c241ee5765ef6710eff010f
+Author: Paul Chambers <paul@fullrefit.com>
+Date:   Mon May 11 13:02:13 2026 -0700
+
+    feat: BYOK routes + dialog for power-user unlimited mode
+    
+    - /api/byok/diagnose, /questions, /output mirror demo routes
+    - Key passed via X-API-Key header, validated as sk-ant- prefix
+    - ApiKeyDialog (modal) stores key in sessionStorage only — never server-side
+    - Header toggles dialog; auto-routes client fetches to byok when key present
+    - lib/api-fetch.ts centralizes demo-vs-byok routing
+    - Clean error path for invalid keys (no leakage in logs)
+
+diff --git a/app/api/byok/diagnose/route.ts b/app/api/byok/diagnose/route.ts
+new file mode 100644
+index 0000000..52e8fdc
+--- /dev/null
++++ b/app/api/byok/diagnose/route.ts
+@@ -0,0 +1,77 @@
++import { NextResponse } from "next/server";
++import { callClaude, classifyError, parseJson } from "@/lib/claude";
++import { DIAGNOSIS_SYSTEM } from "@/lib/prompts";
++import { extractBYOKKey } from "@/lib/byok-helpers";
++import type { Diagnosis } from "@/lib/types";
++
++export const runtime = "nodejs";
++export const dynamic = "force-dynamic";
++
++const MAX_INPUT_CHARS = 30000;
++
++export async function POST(req: Request) {
++  const apiKey = extractBYOKKey(req);
++  if (!apiKey) {
++    return NextResponse.json(
++      {
++        error:
++          "Provide your Anthropic API key via the X-API-Key header (starts with sk-ant-).",
++      },
++      { status: 401 },
++    );
++  }
++
++  let body: { resume?: string; jd?: string; atsVendor?: string };
++  try {
++    body = await req.json();
++  } catch {
++    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
++  }
++
++  const resume = (body.resume ?? "").slice(0, MAX_INPUT_CHARS).trim();
++  const jd = (body.jd ?? "").slice(0, MAX_INPUT_CHARS).trim();
++  const atsVendor = (body.atsVendor ?? "").slice(0, 50).trim();
++
++  if (resume.length < 50 || jd.length < 50) {
++    return NextResponse.json(
++      { error: "Resume and job description must each be at least 50 characters." },
++      { status: 400 },
++    );
++  }
++
++  const userPrompt = `Resume:
++"""
++${resume}
++"""
++
++Job description:
++"""
++${jd}
++"""${
++    atsVendor && atsVendor !== "Don't know"
++      ? `\n\nTarget ATS: ${atsVendor}. Adjust weighting accordingly.`
++      : ""
++  }
++
++Diagnose the gap. Return STRICT JSON only matching the schema in the system instructions.`;
++
++  try {
++    const text = await callClaude({
++      apiKey,
++      task: "diagnosis",
++      system: DIAGNOSIS_SYSTEM,
++      user: userPrompt,
++    });
++    const parsed = parseJson<Diagnosis>(text);
++    if (!parsed) {
++      return NextResponse.json(
++        { error: "Model returned an unparseable response. Try again." },
++        { status: 502 },
++      );
++    }
++    return NextResponse.json({ diagnosis: parsed });
++  } catch (err) {
++    const c = classifyError(err);
++    return NextResponse.json({ error: c.message }, { status: c.status });
++  }
++}
+diff --git a/app/api/byok/output/route.ts b/app/api/byok/output/route.ts
+new file mode 100644
+index 0000000..00d19e4
+--- /dev/null
++++ b/app/api/byok/output/route.ts
+@@ -0,0 +1,66 @@
++import { NextResponse } from "next/server";
++import { classifyError } from "@/lib/claude";
++import { runOutputFlow } from "@/lib/output-flow";
++import { extractBYOKKey } from "@/lib/byok-helpers";
++
++export const runtime = "nodejs";
++export const dynamic = "force-dynamic";
++export const maxDuration = 60;
++
++const MAX_INPUT_CHARS = 30000;
++
++export async function POST(req: Request) {
++  const apiKey = extractBYOKKey(req);
++  if (!apiKey) {
++    return NextResponse.json(
++      { error: "Provide your Anthropic API key via the X-API-Key header." },
++      { status: 401 },
++    );
++  }
++
++  let body: {
++    resume?: string;
++    jd?: string;
++    intakeAnswers?: { question: string; answer: string }[];
++  };
++  try {
++    body = await req.json();
++  } catch {
++    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
++  }
++
++  const resume = (body.resume ?? "").slice(0, MAX_INPUT_CHARS).trim();
++  const jd = (body.jd ?? "").slice(0, MAX_INPUT_CHARS).trim();
++  const intakeAnswers = Array.isArray(body.intakeAnswers)
++    ? body.intakeAnswers
++        .map((a) => ({
++          question: String(a.question ?? "").slice(0, 1000),
++          answer: String(a.answer ?? "").slice(0, 4000),
++        }))
++        .filter((a) => a.answer.trim().length > 0)
++    : [];
++
++  if (resume.length < 50 || jd.length < 50 || intakeAnswers.length < 1) {
++    return NextResponse.json(
++      { error: "Missing resume, JD, or intake answers." },
++      { status: 400 },
++    );
++  }
++
++  try {
++    const result = await runOutputFlow({
++      apiKey,
++      resume,
++      jd,
++      intakeAnswers,
++    });
++    return NextResponse.json({
++      output: result.output,
++      guarded: result.guarded,
++      attempts: result.attempts,
++    });
++  } catch (err) {
++    const c = classifyError(err);
++    return NextResponse.json({ error: c.message }, { status: c.status });
++  }
++}
+diff --git a/app/api/byok/questions/route.ts b/app/api/byok/questions/route.ts
+new file mode 100644
+index 0000000..40f7055
+--- /dev/null
++++ b/app/api/byok/questions/route.ts
+@@ -0,0 +1,81 @@
++import { NextResponse } from "next/server";
++import { callClaude, classifyError, parseJson } from "@/lib/claude";
++import { QUESTIONS_SYSTEM } from "@/lib/prompts";
++import { extractBYOKKey } from "@/lib/byok-helpers";
++import type { Diagnosis, QuestionsResponse } from "@/lib/types";
++
++export const runtime = "nodejs";
++export const dynamic = "force-dynamic";
++
++const MAX_INPUT_CHARS = 30000;
++
++export async function POST(req: Request) {
++  const apiKey = extractBYOKKey(req);
++  if (!apiKey) {
++    return NextResponse.json(
++      { error: "Provide your Anthropic API key via the X-API-Key header." },
++      { status: 401 },
++    );
++  }
++
++  let body: { resume?: string; jd?: string; diagnosis?: Diagnosis };
++  try {
++    body = await req.json();
++  } catch {
++    return NextResponse.json({ error: "Invalid JSON body." }, { status: 400 });
++  }
++
++  const resume = (body.resume ?? "").slice(0, MAX_INPUT_CHARS).trim();
++  const jd = (body.jd ?? "").slice(0, MAX_INPUT_CHARS).trim();
++  const diagnosis = body.diagnosis;
++  if (resume.length < 50 || jd.length < 50 || !diagnosis) {
++    return NextResponse.json(
++      { error: "Missing resume, JD, or diagnosis." },
++      { status: 400 },
++    );
++  }
++
++  const userPrompt = `Resume:
++"""
++${resume}
++"""
++
++Job description:
++"""
++${jd}
++"""
++
++Diagnosis JSON:
++${JSON.stringify(
++  {
++    matchScore: diagnosis.matchScore,
++    verdict: diagnosis.verdict,
++    topMatches: diagnosis.topMatches,
++    criticalGaps: diagnosis.criticalGaps,
++  },
++  null,
++  2,
++)}
++
++Generate exactly 5 Socratic intake questions. Return STRICT JSON only.`;
++
++  try {
++    const text = await callClaude({
++      apiKey,
++      task: "questions",
++      system: QUESTIONS_SYSTEM,
++      user: userPrompt,
++    });
++    const parsed = parseJson<QuestionsResponse>(text);
++    if (!parsed || !Array.isArray(parsed.questions)) {
++      return NextResponse.json(
++        { error: "Model returned an unparseable response. Try again." },
++        { status: 502 },
++      );
++    }
++    return NextResponse.json({ questions: parsed });
++  } catch (err) {
++    const c = classifyError(err);
++    return NextResponse.json({ error: c.message }, { status: c.status });
++  }
++}
+diff --git a/app/diagnose/DiagnosePageClient.tsx b/app/diagnose/DiagnosePageClient.tsx
+index c204c19..32ca267 100644
+--- a/app/diagnose/DiagnosePageClient.tsx
++++ b/app/diagnose/DiagnosePageClient.tsx
+@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
+ import { useRouter } from "next/navigation";
+ import { DiagnosisCard } from "@/components/DiagnosisCard";
+ import { Button } from "@/components/ui/Button";
++import { callApi } from "@/lib/api-fetch";
+ import { clearSession, loadSession, patchSession } from "@/lib/storage";
+ import type { Diagnosis, QuestionsResponse } from "@/lib/types";
+ 
+@@ -40,17 +41,15 @@ export function DiagnosePageClient() {
+     setLoadingQuestions(true);
+     setError(null);
+     try {
+-      const res = await fetch("/api/demo/questions", {
+-        method: "POST",
+-        headers: { "Content-Type": "application/json" },
+-        body: JSON.stringify({ resume, jd, diagnosis }),
++      const data = await callApi<
++        { resume: string; jd: string; diagnosis: Diagnosis },
++        { questions?: QuestionsResponse }
++      >({
++        endpoint: "questions",
++        body: { resume, jd, diagnosis },
+       });
+-      const data = (await res.json()) as {
+-        questions?: QuestionsResponse;
+-        error?: string;
+-      };
+-      if (!res.ok || !data.questions) {
+-        throw new Error(data.error ?? "Failed to generate questions.");
++      if (!data.questions) {
++        throw new Error("Failed to generate questions.");
+       }
+       patchSession({ questions: data.questions, answers: {} });
+       router.push("/refine");
+diff --git a/app/refine/RefinePageClient.tsx b/app/refine/RefinePageClient.tsx
+index 0626cc8..ab85f11 100644
+--- a/app/refine/RefinePageClient.tsx
++++ b/app/refine/RefinePageClient.tsx
+@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
+ import { useRouter } from "next/navigation";
+ import { Button } from "@/components/ui/Button";
+ import { InfoBlock } from "@/components/ui/InfoBlock";
++import { callApi } from "@/lib/api-fetch";
+ import { loadSession, patchSession } from "@/lib/storage";
+ import type {
+   Question,
+@@ -57,18 +58,19 @@ export function RefinePageClient() {
+         question: q.question,
+         answer: answers[q.id] ?? "",
+       }));
+-      const res = await fetch("/api/demo/output", {
+-        method: "POST",
+-        headers: { "Content-Type": "application/json" },
+-        body: JSON.stringify({ resume, jd, intakeAnswers }),
++      const data = await callApi<
++        {
++          resume: string;
++          jd: string;
++          intakeAnswers: { question: string; answer: string }[];
++        },
++        { output?: TailoredOutput; guarded?: boolean }
++      >({
++        endpoint: "output",
++        body: { resume, jd, intakeAnswers },
+       });
+-      const data = (await res.json()) as {
+-        output?: TailoredOutput;
+-        guarded?: boolean;
+-        error?: string;
+-      };
+-      if (!res.ok || !data.output) {
+-        throw new Error(data.error ?? "Failed to generate output.");
++      if (!data.output) {
++        throw new Error("Failed to generate output.");
+       }
+       patchSession({ tailored: data.output });
+       router.push("/result");
+diff --git a/components/ApiKeyDialog.tsx b/components/ApiKeyDialog.tsx
+new file mode 100644
+index 0000000..3c8a3f6
+--- /dev/null
++++ b/components/ApiKeyDialog.tsx
+@@ -0,0 +1,109 @@
++"use client";
++
++import { useEffect, useState } from "react";
++import { Button } from "@/components/ui/Button";
++import { clearByokKey, loadByokKey, saveByokKey } from "@/lib/storage";
++
++interface Props {
++  open: boolean;
++  onClose: () => void;
++}
++
++export function ApiKeyDialog({ open, onClose }: Props) {
++  const [value, setValue] = useState("");
++  const [saved, setSaved] = useState(false);
++
++  useEffect(() => {
++    if (open) {
++      const existing = loadByokKey();
++      setValue(existing ?? "");
++      setSaved(Boolean(existing));
++    }
++  }, [open]);
++
++  if (!open) return null;
++
++  function onSave() {
++    const trimmed = value.trim();
++    if (!trimmed.startsWith("sk-ant-")) {
++      setSaved(false);
++      return;
++    }
++    saveByokKey(trimmed);
++    setSaved(true);
++    onClose();
++  }
++
++  function onRemove() {
++    clearByokKey();
++    setValue("");
++    setSaved(false);
++  }
++
++  return (
++    <div
++      className="fixed inset-0 z-50 flex items-end justify-center bg-carbon-core/60 p-4 sm:items-center"
++      onClick={onClose}
++    >
++      <div
++        className="card-surface w-full max-w-md"
++        onClick={(e) => e.stopPropagation()}
++      >
++        <p className="section-label mb-2">Bring your own API key</p>
++        <h2 className="text-xl font-semibold tracking-tight text-carbon-core">
++          Unlimited runs with your Anthropic key.
++        </h2>
++        <p className="mt-2 text-sm text-carbon-core">
++          Your key is stored in this browser tab only (sessionStorage) — never
++          sent to any server other than Anthropic. Get one at{" "}
++          <a
++            href="https://console.anthropic.com/settings/keys"
++            target="_blank"
++            rel="noopener noreferrer"
++            className="font-medium text-forge-red hover:text-forge-red-hover"
++          >
++            console.anthropic.com
++          </a>
++          .
++        </p>
++        <label className="mt-4 block text-xs uppercase tracking-[0.08em] text-echo">
++          sk-ant-… key
++        </label>
++        <input
++          type="password"
++          autoComplete="off"
++          value={value}
++          onChange={(e) => setValue(e.target.value)}
++          placeholder="sk-ant-..."
++          className="mt-1 min-h-12 w-full rounded-lg border border-soft-gray bg-pure-white px-3 text-base text-carbon-core focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forge-red"
++        />
++        <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:justify-between">
++          <Button
++            variant="secondary"
++            onClick={onRemove}
++            className="sm:w-auto"
++            type="button"
++          >
++            Remove key
++          </Button>
++          <div className="flex gap-2">
++            <Button
++              variant="secondary"
++              onClick={onClose}
++              className="sm:w-auto"
++              type="button"
++            >
++              Cancel
++            </Button>
++            <Button onClick={onSave} className="sm:w-auto" type="button">
++              Save key
++            </Button>
++          </div>
++        </div>
++        {saved && (
++          <p className="mt-2 text-xs text-echo">Saved for this session.</p>
++        )}
++      </div>
++    </div>
++  );
++}
+diff --git a/components/Header.tsx b/components/Header.tsx
+index c503c9b..4ed9750 100644
+--- a/components/Header.tsx
++++ b/components/Header.tsx
+@@ -1,24 +1,49 @@
++"use client";
++
+ import Link from "next/link";
++import { useEffect, useState } from "react";
++import { ApiKeyDialog } from "@/components/ApiKeyDialog";
++import { loadByokKey } from "@/lib/storage";
+ 
+ export function Header() {
++  const [open, setOpen] = useState(false);
++  const [hasKey, setHasKey] = useState(false);
++
++  useEffect(() => {
++    setHasKey(Boolean(loadByokKey()));
++  }, [open]);
++
+   return (
+-    <header className="w-full border-b border-soft-gray bg-pure-white">
+-      <div className="mx-auto flex max-w-[720px] items-center justify-between px-4 py-4 sm:px-6">
+-        <Link href="/" className="flex flex-col">
+-          <span className="text-base font-semibold tracking-tight text-carbon-core sm:text-lg">
+-            AI Resume Advisor
+-          </span>
+-          <span className="hidden text-[0.75rem] text-echo sm:block">
+-            Honest diagnosis. No fabrication. ATS-optimized.
+-          </span>
+-        </Link>
+-        <Link
+-          href="/about"
+-          className="text-sm font-medium text-forge-red hover:text-forge-red-hover"
+-        >
+-          How it works
+-        </Link>
+-      </div>
+-    </header>
++    <>
++      <header className="w-full border-b border-soft-gray bg-pure-white">
++        <div className="mx-auto flex max-w-[720px] items-center justify-between gap-3 px-4 py-4 sm:px-6">
++          <Link href="/" className="flex flex-col">
++            <span className="text-base font-semibold tracking-tight text-carbon-core sm:text-lg">
++              AI Resume Advisor
++            </span>
++            <span className="hidden text-[0.75rem] text-echo sm:block">
++              Honest diagnosis. No fabrication. ATS-optimized.
++            </span>
++          </Link>
++          <div className="flex items-center gap-3">
++            <button
++              type="button"
++              onClick={() => setOpen(true)}
++              className="text-xs font-medium text-echo hover:text-carbon-core"
++              aria-label="Bring your own API key"
++            >
++              {hasKey ? "Your key · BYOK" : "Use my own key"}
++            </button>
++            <Link
++              href="/about"
++              className="text-sm font-medium text-forge-red hover:text-forge-red-hover"
++            >
++              How it works
++            </Link>
++          </div>
++        </div>
++      </header>
++      <ApiKeyDialog open={open} onClose={() => setOpen(false)} />
++    </>
+   );
+ }
+diff --git a/components/IntakeForm.tsx b/components/IntakeForm.tsx
+index 99aa2f6..1bdfc65 100644
+--- a/components/IntakeForm.tsx
++++ b/components/IntakeForm.tsx
+@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
+ import { ATSContextBlock } from "@/components/ATSContextBlock";
+ import { LocalStorageDisclaimer } from "@/components/LocalStorageDisclaimer";
+ import { ResumeUpload } from "@/components/ResumeUpload";
++import { callApi } from "@/lib/api-fetch";
+ import { loadSession, patchSession } from "@/lib/storage";
+ import type { AtsVendor, Diagnosis } from "@/lib/types";
+ 
+@@ -45,17 +46,15 @@ export function IntakeForm() {
+     setError(null);
+     setLoading(true);
+     try {
+-      const res = await fetch("/api/demo/diagnose", {
+-        method: "POST",
+-        headers: { "Content-Type": "application/json" },
+-        body: JSON.stringify({ resume, jd, atsVendor }),
++      const data = await callApi<
++        { resume: string; jd: string; atsVendor: AtsVendor },
++        { diagnosis?: Diagnosis }
++      >({
++        endpoint: "diagnose",
++        body: { resume, jd, atsVendor },
+       });
+-      const data = (await res.json()) as {
+-        error?: string;
+-        diagnosis?: Diagnosis;
+-      };
+-      if (!res.ok || !data.diagnosis) {
+-        throw new Error(data.error ?? "Diagnosis failed.");
++      if (!data.diagnosis) {
++        throw new Error("Diagnosis failed.");
+       }
+       patchSession({
+         resume,
+diff --git a/lib/api-fetch.ts b/lib/api-fetch.ts
+new file mode 100644
+index 0000000..b6d56bf
+--- /dev/null
++++ b/lib/api-fetch.ts
+@@ -0,0 +1,32 @@
++"use client";
++
++import { loadByokKey } from "./storage";
++
++type Endpoint = "diagnose" | "questions" | "output";
++
++export interface CallApiArgs<TBody> {
++  endpoint: Endpoint;
++  body: TBody;
++}
++
++export async function callApi<TBody, TResp>({
++  endpoint,
++  body,
++}: CallApiArgs<TBody>): Promise<TResp> {
++  const key = loadByokKey();
++  const url = key ? `/api/byok/${endpoint}` : `/api/demo/${endpoint}`;
++  const headers: Record<string, string> = {
++    "Content-Type": "application/json",
++  };
++  if (key) headers["X-API-Key"] = key;
++  const res = await fetch(url, {
++    method: "POST",
++    headers,
++    body: JSON.stringify(body),
++  });
++  const data = (await res.json()) as TResp & { error?: string };
++  if (!res.ok) {
++    throw new Error(data.error ?? `Request to /${endpoint} failed.`);
++  }
++  return data;
++}
+diff --git a/lib/byok-helpers.ts b/lib/byok-helpers.ts
+new file mode 100644
+index 0000000..aec24c9
+--- /dev/null
++++ b/lib/byok-helpers.ts
+@@ -0,0 +1,9 @@
++const KEY_PREFIX = /^sk-ant-/;
++
++export function extractBYOKKey(req: Request): string | null {
++  const header = req.headers.get("x-api-key");
++  if (!header) return null;
++  const trimmed = header.trim();
++  if (!KEY_PREFIX.test(trimmed)) return null;
++  return trimmed;
++}

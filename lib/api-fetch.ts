@@ -1,5 +1,7 @@
 "use client";
 
+import { loadByokKey } from "./byok-storage";
+
 type DemoEndpoint =
   | "diagnose"
   | "questions"
@@ -41,6 +43,8 @@ export async function callApi<TBody, TResp>({
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   const bypass = getBypassToken();
   if (bypass) headers["x-bypass-token"] = bypass;
+  const byok = loadByokKey();
+  if (byok) headers["x-user-api-key"] = byok;
 
   const res = await fetch(urlFor(endpoint), {
     method: "POST",

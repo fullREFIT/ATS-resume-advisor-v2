@@ -1,4 +1,4 @@
-import { callClaude, parseJson } from "./claude";
+import { callClaude, parseJson, type ModelProvider } from "./claude";
 import {
   FABRICATION_GUARD_SYSTEM,
   OUTPUT_SYSTEM,
@@ -15,6 +15,7 @@ export interface RunOutputFlowArgs {
   resume: string;
   jd: string;
   intakeAnswers: { question: string; answer: string }[];
+  providerOverride?: ModelProvider;
 }
 
 const MAX_GUARD_RETRIES = 1;
@@ -76,6 +77,7 @@ export async function runOutputFlow(
     const userPrompt = buildUserPrompt(args, lastFlags);
     const text = await callClaude({
       apiKey: args.apiKey,
+      providerOverride: args.providerOverride,
       task: "output",
       system: OUTPUT_SYSTEM,
       user: userPrompt,
@@ -89,6 +91,7 @@ export async function runOutputFlow(
     const flat = flattenBullets(parsed);
     const guardText = await callClaude({
       apiKey: args.apiKey,
+      providerOverride: args.providerOverride,
       task: "fabrication_guard",
       system: FABRICATION_GUARD_SYSTEM,
       user: `Original resume:

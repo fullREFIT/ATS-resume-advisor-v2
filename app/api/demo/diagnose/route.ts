@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { callClaude, classifyError, parseJson } from "@/lib/claude";
+import { callClaude, classifyError, parseJson, getProviderApiKey } from "@/lib/claude";
 import { DIAGNOSIS_SYSTEM } from "@/lib/prompts";
-import { consumeQuota, rateLimitWarning } from "@/lib/ratelimit";
+import { consumeQuota, rateLimitWarning, consumeQuotaUnlessByok, consumeBudget, consumeBudgetUnlessByok, estimateRequestCost, budgetExhaustedMessage } from "@/lib/ratelimit";
 import type { Diagnosis } from "@/lib/types";
+import { extractByokKey } from "@/lib/byok-helpers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,7 +11,8 @@ export const dynamic = "force-dynamic";
 const MAX_INPUT_CHARS = 30000;
 
 export async function POST(req: Request) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const byokKey = extractByokKey(req);
+  const apiKey = byokKey ?? getProviderApiKey();
   if (!apiKey) {
     return NextResponse.json(
       { error: "Server is not configured. Come back later." },
@@ -18,7 +20,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const quota = await consumeQuota(req);
+  const quota = await consumeQuotaUnlessByok(req, byokKey);
   if (!quota.allowed) {
     return NextResponse.json(
       {
@@ -26,6 +28,14 @@ export async function POST(req: Request) {
         rateLimit: quota,
       },
       { status: 429 },
+    );
+  }
+
+  const budget = await consumeBudgetUnlessByok(byokKey, estimateRequestCost("diagnosis"));
+  if (!budget.allowed) {
+    return NextResponse.json(
+      { error: budgetExhaustedMessage(), budget },
+      { status: 503 },
     );
   }
 
@@ -64,6 +74,7 @@ Diagnose the gap. Return STRICT JSON only matching the schema in the system inst
   try {
     const text = await callClaude({
       apiKey,
+      providerOverride: byokKey ? "anthropic" : undefined,
       task: "diagnosis",
       system: DIAGNOSIS_SYSTEM,
       user: userPrompt,

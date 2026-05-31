@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
-import { callClaude, classifyError, parseJson } from "@/lib/claude";
+import { callClaude, classifyError, parseJson, getProviderApiKey } from "@/lib/claude";
 import { COVER_LETTER_SYSTEM, FABRICATION_GUARD_SYSTEM } from "@/lib/prompts";
-import { consumeQuota } from "@/lib/ratelimit";
+import { consumeQuota, consumeQuotaUnlessByok, consumeBudget, consumeBudgetUnlessByok, estimateRequestCost, budgetExhaustedMessage } from "@/lib/ratelimit";
 import type { CoverLetterOutput } from "@/lib/types";
+import { extractByokKey } from "@/lib/byok-helpers";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -101,7 +102,8 @@ Flag any claims in the cover letter that are NOT supported by the resume or inta
 }
 
 export async function POST(req: Request) {
-  const quota = await consumeQuota(req);
+  const byokKey = extractByokKey(req);
+  const quota = await consumeQuotaUnlessByok(req, byokKey);
   if (!quota.allowed) {
     return NextResponse.json(
       { error: "Daily limit reached. Try again tomorrow." },
@@ -109,7 +111,15 @@ export async function POST(req: Request) {
     );
   }
 
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const budget = await consumeBudgetUnlessByok(byokKey, estimateRequestCost("output"));
+  if (!budget.allowed) {
+    return NextResponse.json(
+      { error: budgetExhaustedMessage(), budget },
+      { status: 503 },
+    );
+  }
+
+  const apiKey = byokKey ?? getProviderApiKey();
   if (!apiKey) {
     return NextResponse.json(
       { error: "API key not configured." },
@@ -134,6 +144,7 @@ export async function POST(req: Request) {
     // Generation (Sonnet)
     let text = await callClaude({
       apiKey,
+      providerOverride: byokKey ? "anthropic" : undefined,
       task: "output",
       system: COVER_LETTER_SYSTEM,
       user: userPrompt,
@@ -151,6 +162,7 @@ export async function POST(req: Request) {
     // Fabrication guard (Haiku)
     const guardText = await callClaude({
       apiKey,
+      providerOverride: byokKey ? "anthropic" : undefined,
       task: "fabrication_guard",
       system: FABRICATION_GUARD_SYSTEM,
       user: buildGuardPrompt(body, output.coverLetter),
@@ -170,6 +182,7 @@ export async function POST(req: Request) {
 
       text = await callClaude({
         apiKey,
+        providerOverride: byokKey ? "anthropic" : undefined,
         task: "output",
         system: COVER_LETTER_SYSTEM,
         user: retryPrompt,
