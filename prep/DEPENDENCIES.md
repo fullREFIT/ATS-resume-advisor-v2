@@ -6,7 +6,7 @@
 |---|---|---|---|
 | Vercel (fullrefit team) | Production hosting | `vercel` CLI signed in as Paul | LIVE |
 | Upstash Redis / Vercel KV | Rate limit + budget + unlock tokens | Env vars (already set in Vercel prod 10d ago) | LIVE |
-| OpenRouter | LLM routing → DeepInfra/Together/Fireworks/Cerebras | `OPENROUTER_RESUME_VERDICT_API` env var | PENDING (Task 2.2) |
+| OpenRouter | LLM routing → DeepInfra/Together/Fireworks/Cerebras | `OPEN_ROUTER_RESUME_VERDICT_API` env var | PENDING (Task 2.2) |
 | Stripe | Checkout + webhook | `STRIPE_RESUME_VERDICT_SECRET` + webhook secret | PENDING (Task 4.2) |
 | Anthropic | BYOK + rollback fallback | User-provided keys (BYOK) + `ANTHROPIC_API_KEY` in Vercel env (kept as safety net) | LIVE (rollback path) |
 | 1Password "Dev Credentials" vault | Source of truth for env vars | Paul's biometric | LIVE |
@@ -34,7 +34,7 @@
 | Var | Source | Required for |
 |---|---|---|
 | `MODEL_PROVIDER` | Paul sets to `openrouter` | All non-BYOK traffic |
-| `OPENROUTER_RESUME_VERDICT_API` | 1Password / Paul | All non-BYOK traffic |
+| `OPEN_ROUTER_RESUME_VERDICT_API` | 1Password / Paul | All non-BYOK traffic |
 | `ANTHROPIC_API_KEY` | Existing (kept as rollback) | Reverting if OpenRouter fails |
 | `DEMO_DAILY_LIMIT` | Update to `2` | Free tier rate limit |
 | `LLM_MONTHLY_BUDGET_USD` | Set to `40` | Budget kill-switch |

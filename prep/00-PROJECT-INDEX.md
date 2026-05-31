@@ -17,8 +17,8 @@ Updated live as tasks complete. Status: PENDING | IN_PROGRESS | DONE | BLOCKED |
 |---|---|---|---|---|
 | 2.1 | Extend `lib/claude.ts` with `openrouter` provider + `callOpenRouter()` | Claude | PENDING | `lib/claude.ts` updated |
 | 2.2 | Create OpenRouter account, generate API key | Paul | PENDING | `gsk_...` key in 1Password |
-| 2.3 | Add `OPENROUTER_RESUME_VERDICT_API` to 1Password vault + `/update-pw` | Paul | PENDING | env var resolvable locally |
-| 2.4 | Set Vercel prod env: `MODEL_PROVIDER=openrouter`, `OPENROUTER_RESUME_VERDICT_API=<key>` | Paul (or Claude via CLI) | PENDING | Vercel env updated |
+| 2.3 | Add `OPEN_ROUTER_RESUME_VERDICT_API` to 1Password vault + `/update-pw` | Paul | PENDING | env var resolvable locally |
+| 2.4 | Set Vercel prod env: `MODEL_PROVIDER=openrouter`, `OPEN_ROUTER_RESUME_VERDICT_API=<key>` | Paul (or Claude via CLI) | PENDING | Vercel env updated |
 | 2.5 | Smoke-test one production verdict via curl, confirm OpenRouter dashboard shows traffic | Paul | PENDING | screenshot or curl output |
 
 ## Phase 3 — BYOK restoration (MUST SHIP)

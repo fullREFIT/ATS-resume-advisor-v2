@@ -37,7 +37,7 @@ ai-resume-advisor:unlock-session:<stripe-session-id> → <token> (TTL 7 days, de
 
 OpenRouter is OpenAI-compatible. Use the `openai` npm SDK with:
 - `baseURL: "https://openrouter.ai/api/v1"`
-- `apiKey: process.env.OPENROUTER_RESUME_VERDICT_API`
+- `apiKey: process.env.OPEN_ROUTER_RESUME_VERDICT_API`
 - Default headers: `HTTP-Referer: https://ats-resume-advisor-v2.vercel.app`, `X-Title: Resume Verdict`
 - Per-request `extra_body: { provider: { order: ["DeepInfra", "Together", "Fireworks", "Cerebras"] } }`
 

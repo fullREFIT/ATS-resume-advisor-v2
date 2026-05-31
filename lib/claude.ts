@@ -64,7 +64,7 @@ export function getActiveProvider(): ModelProvider {
 export function getProviderApiKey(provider: ModelProvider = PROVIDER): string | undefined {
   switch (provider) {
     case "openrouter":
-      return process.env.OPENROUTER_RESUME_VERDICT_API;
+      return process.env.OPEN_ROUTER_RESUME_VERDICT_API;
     case "groq":
       return process.env.GROQ_RESUME_VERDICT_API;
     case "anthropic":
@@ -78,7 +78,7 @@ export function isProviderConfigured(): boolean {
 
 function providerEnvVar(provider: ModelProvider): string {
   switch (provider) {
-    case "openrouter": return "OPENROUTER_RESUME_VERDICT_API";
+    case "openrouter": return "OPEN_ROUTER_RESUME_VERDICT_API";
     case "groq": return "GROQ_RESUME_VERDICT_API";
     case "anthropic": return "ANTHROPIC_API_KEY";
   }

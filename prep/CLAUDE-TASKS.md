@@ -103,7 +103,7 @@ vercel env ls production | grep -E "DEMO_DAILY_LIMIT|BUDGET"
      fabrication_guard: "meta-llama/llama-3.3-70b-instruct",
    },
    ```
-4. Update `getProviderApiKey()` to add `case "openrouter": return process.env.OPENROUTER_RESUME_VERDICT_API`.
+4. Update `getProviderApiKey()` to add `case "openrouter": return process.env.OPEN_ROUTER_RESUME_VERDICT_API`.
 5. Add `callOpenRouter()` function. Use the official `openai` npm package (which is OpenAI-compatible and works with OpenRouter's `https://openrouter.ai/api/v1` endpoint). Pass `provider: { order: ["DeepInfra", "Together", "Fireworks", "Cerebras"] }` in `extra_body` for auto-failover. Also set headers `HTTP-Referer: https://ats-resume-advisor-v2.vercel.app` and `X-Title: Resume Verdict` (OpenRouter's attribution convention).
 6. Update the `if (PROVIDER === "groq")` dispatch to add `else if (PROVIDER === "openrouter") return callOpenRouter(...)`.
 7. Update `classifyError()` to recognize OpenRouter errors (same shape as OpenAI SDK errors — `instanceof OpenAI.APIError`).
@@ -113,7 +113,7 @@ vercel env ls production | grep -E "DEMO_DAILY_LIMIT|BUDGET"
 
 **Acceptance:**
 - `npm run build` passes
-- `MODEL_PROVIDER=openrouter` + `OPENROUTER_RESUME_VERDICT_API=test` produces a request to `https://openrouter.ai/api/v1` (verify by reading the code — actual network test happens at smoke-test step)
+- `MODEL_PROVIDER=openrouter` + `OPEN_ROUTER_RESUME_VERDICT_API=test` produces a request to `https://openrouter.ai/api/v1` (verify by reading the code — actual network test happens at smoke-test step)
 - `MODEL_PROVIDER=anthropic` still routes to Anthropic (no regression)
 
 ---
@@ -140,14 +140,14 @@ vercel env ls production | grep -E "DEMO_DAILY_LIMIT|BUDGET"
 **Owner:** Paul
 
 1. 1Password app → **Dev Credentials** vault → New Item → API Credential
-2. Title: `OPENROUTER_RESUME_VERDICT_API` (exact)
+2. Title: `OPEN_ROUTER_RESUME_VERDICT_API` (exact)
 3. Password field: paste the `sk-or-v1-...` key
 4. Save
 5. Terminal: `/update-pw`
-6. Verify: `echo "OPENROUTER_RESUME_VERDICT_API=${OPENROUTER_RESUME_VERDICT_API:+SET}"`
+6. Verify: `echo "OPEN_ROUTER_RESUME_VERDICT_API=${OPEN_ROUTER_RESUME_VERDICT_API:+SET}"`
 
 **Acceptance:**
-- Echo prints `OPENROUTER_RESUME_VERDICT_API=SET`
+- Echo prints `OPEN_ROUTER_RESUME_VERDICT_API=SET`
 
 ---
 
@@ -158,13 +158,13 @@ vercel env ls production | grep -E "DEMO_DAILY_LIMIT|BUDGET"
 **Commands** (Paul provides `<KEY>`):
 ```bash
 cd /Users/paul/dev-5/projects/resume-verdict/.claude/worktrees/groq-swap-053126
-echo "<KEY>" | vercel env add OPENROUTER_RESUME_VERDICT_API production
+echo "<KEY>" | vercel env add OPEN_ROUTER_RESUME_VERDICT_API production
 echo "openrouter" | vercel env add MODEL_PROVIDER production
 vercel env ls production | grep -E "OPENROUTER|MODEL_PROVIDER"
 ```
 
 **Acceptance:**
-- `vercel env ls production` shows both `OPENROUTER_RESUME_VERDICT_API` and `MODEL_PROVIDER`
+- `vercel env ls production` shows both `OPEN_ROUTER_RESUME_VERDICT_API` and `MODEL_PROVIDER`
 
 ---
 
