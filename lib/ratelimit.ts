@@ -192,3 +192,75 @@ export async function getBudgetState(): Promise<{ mtdSpend: number; budget: numb
 export function budgetExhaustedMessage(): string {
   return "This month's free-tier budget is exhausted. Try again next month, bring your own Anthropic API key for unlimited verdicts, or unlock 10 verdicts for $9.";
 }
+
+// ---------- Stripe unlock token consume ----------
+//
+// A valid unlock token (issued by /api/stripe/webhook after a $9 Checkout)
+// bypasses the per-IP rate limit AND the monthly budget. Each successful
+// call decrements `remaining` on the token's KV entry; once `remaining`
+// reaches 0 the token stops working and the user falls back to free tier.
+
+export interface UnlockResult {
+  valid: boolean;
+  remaining: number;
+}
+
+interface UnlockPayload {
+  remaining: number;
+  sessionId: string;
+  createdAt: number;
+}
+
+export async function consumeUnlockToken(req: Request): Promise<UnlockResult> {
+  const token = req.headers.get("x-unlock-token");
+  if (!token || !token.startsWith("ulk_")) {
+    return { valid: false, remaining: 0 };
+  }
+  const redis = kvClient();
+  if (!redis) return { valid: false, remaining: 0 };
+
+  const key = `ai-resume-advisor:unlock:${token}`;
+  const raw = await redis.get<string | UnlockPayload>(key);
+  if (raw == null) return { valid: false, remaining: 0 };
+
+  let data: UnlockPayload;
+  try {
+    data = typeof raw === "string" ? (JSON.parse(raw) as UnlockPayload) : raw;
+  } catch {
+    return { valid: false, remaining: 0 };
+  }
+  if (typeof data?.remaining !== "number" || data.remaining <= 0) {
+    return { valid: false, remaining: 0 };
+  }
+
+  data.remaining -= 1;
+  // keepTtl preserves the 90-day window the webhook set at issuance.
+  await redis.set(key, JSON.stringify(data), { keepTtl: true });
+  return { valid: true, remaining: data.remaining };
+}
+
+// ---------- Generic skip helpers ----------
+//
+// Replace the BYOK-only skip variants when a route needs to honor multiple
+// privileged paths (BYOK OR valid unlock token). Pass `skip = true` to
+// bypass the consume entirely and return a no-op "allowed" result.
+
+export async function consumeQuotaUnless(
+  req: Request,
+  skip: boolean,
+): Promise<RateLimitResult> {
+  if (skip) {
+    return { allowed: true, remaining: -1, reset: 0, limit: -1, enforced: false };
+  }
+  return consumeQuota(req);
+}
+
+export async function consumeBudgetUnless(
+  skip: boolean,
+  estimatedCostUsd: number,
+): Promise<BudgetResult> {
+  if (skip) {
+    return { allowed: true, mtdSpend: 0, budget: 0, enforced: false };
+  }
+  return consumeBudget(estimatedCostUsd);
+}

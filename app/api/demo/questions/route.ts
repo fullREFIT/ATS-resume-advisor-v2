@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { callClaude, classifyError, parseJson, getProviderApiKey } from "@/lib/claude";
 import { QUESTIONS_SYSTEM } from "@/lib/prompts";
-import { consumeQuota, rateLimitWarning, consumeQuotaUnlessByok, consumeBudget, consumeBudgetUnlessByok, estimateRequestCost, budgetExhaustedMessage } from "@/lib/ratelimit";
+import { consumeQuota, rateLimitWarning, consumeBudget, estimateRequestCost, budgetExhaustedMessage, consumeQuotaUnless, consumeBudgetUnless, consumeUnlockToken } from "@/lib/ratelimit";
 import type { Diagnosis, QuestionsResponse } from "@/lib/types";
 import { extractByokKey } from "@/lib/byok-helpers";
 
@@ -12,6 +12,8 @@ const MAX_INPUT_CHARS = 30000;
 
 export async function POST(req: Request) {
   const byokKey = extractByokKey(req);
+  const unlock = await consumeUnlockToken(req);
+  const skipMetering = !!byokKey || unlock.valid;
   const apiKey = byokKey ?? getProviderApiKey();
   if (!apiKey) {
     return NextResponse.json(
@@ -20,7 +22,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const quota = await consumeQuotaUnlessByok(req, byokKey);
+  const quota = await consumeQuotaUnless(req, skipMetering);
   if (!quota.allowed) {
     return NextResponse.json(
       { error: "Daily limit reached.", rateLimit: quota },
@@ -28,7 +30,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const budget = await consumeBudgetUnlessByok(byokKey, estimateRequestCost("questions"));
+  const budget = await consumeBudgetUnless(skipMetering, estimateRequestCost("questions"));
   if (!budget.allowed) {
     return NextResponse.json(
       { error: budgetExhaustedMessage(), budget },

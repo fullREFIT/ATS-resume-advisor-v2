@@ -3,15 +3,20 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { ByokDialog } from "./ByokDialog";
+import { PricingTiers } from "./PricingTiers";
 import { loadByokKey } from "@/lib/byok-storage";
+import { getUnlockToken } from "@/lib/unlock-client";
 
 export function Header() {
-  const [dialogOpen, setDialogOpen] = useState(false);
+  const [byokOpen, setByokOpen] = useState(false);
+  const [pricingOpen, setPricingOpen] = useState(false);
   const [hasKey, setHasKey] = useState(false);
+  const [hasUnlock, setHasUnlock] = useState(false);
 
   useEffect(() => {
     setHasKey(Boolean(loadByokKey()));
-  }, [dialogOpen]);
+    setHasUnlock(Boolean(getUnlockToken()));
+  }, [byokOpen, pricingOpen]);
 
   return (
     <>
@@ -28,11 +33,10 @@ export function Header() {
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               type="button"
-              onClick={() => setDialogOpen(true)}
+              onClick={() => setPricingOpen(true)}
               className="inline-flex min-h-11 items-center text-sm font-medium text-[#a8a29e] hover:text-[#e8e4de] transition-colors"
-              aria-label="Bring your own Anthropic API key for unlimited verdicts"
             >
-              {hasKey ? "Your key ✓" : "Use your own key"}
+              {hasUnlock ? "Unlock ✓" : hasKey ? "Plans" : "Get unlimited"}
             </button>
             <Link
               href="/about"
@@ -43,7 +47,13 @@ export function Header() {
           </div>
         </div>
       </header>
-      <ByokDialog open={dialogOpen} onClose={() => setDialogOpen(false)} />
+      <ByokDialog open={byokOpen} onClose={() => setByokOpen(false)} />
+      {pricingOpen && (
+        <PricingTiers
+          variant="paywall"
+          onClose={() => setPricingOpen(false)}
+        />
+      )}
     </>
   );
 }

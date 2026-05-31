@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { classifyError, getProviderApiKey } from "@/lib/claude";
 import { runOutputFlow } from "@/lib/output-flow";
-import { consumeQuota, rateLimitWarning, consumeQuotaUnlessByok, consumeBudget, consumeBudgetUnlessByok, estimateRequestCost, budgetExhaustedMessage } from "@/lib/ratelimit";
+import { consumeQuota, rateLimitWarning, consumeBudget, estimateRequestCost, budgetExhaustedMessage, consumeQuotaUnless, consumeBudgetUnless, consumeUnlockToken } from "@/lib/ratelimit";
 import { extractByokKey } from "@/lib/byok-helpers";
 
 export const runtime = "nodejs";
@@ -12,6 +12,8 @@ const MAX_INPUT_CHARS = 30000;
 
 export async function POST(req: Request) {
   const byokKey = extractByokKey(req);
+  const unlock = await consumeUnlockToken(req);
+  const skipMetering = !!byokKey || unlock.valid;
   const apiKey = byokKey ?? getProviderApiKey();
   if (!apiKey) {
     return NextResponse.json(
@@ -20,7 +22,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const quota = await consumeQuotaUnlessByok(req, byokKey);
+  const quota = await consumeQuotaUnless(req, skipMetering);
   if (!quota.allowed) {
     return NextResponse.json(
       { error: "Daily limit reached.", rateLimit: quota },
@@ -28,7 +30,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const budget = await consumeBudgetUnlessByok(byokKey, estimateRequestCost("output"));
+  const budget = await consumeBudgetUnless(skipMetering, estimateRequestCost("output"));
   if (!budget.allowed) {
     return NextResponse.json(
       { error: budgetExhaustedMessage(), budget },

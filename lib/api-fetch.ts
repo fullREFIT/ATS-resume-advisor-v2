@@ -1,6 +1,7 @@
 "use client";
 
 import { loadByokKey } from "./byok-storage";
+import { getUnlockToken } from "./unlock-client";
 
 type DemoEndpoint =
   | "diagnose"
@@ -36,6 +37,20 @@ function getBypassToken(): string | null {
   }
 }
 
+// For direct fetch() callers that don't go through callApi(). Returns the
+// per-request auth headers that the demo routes look for: BYOK key, paid
+// unlock token, and owner bypass token. Spread into your `headers` object.
+export function authHeaders(): Record<string, string> {
+  const out: Record<string, string> = {};
+  const bypass = getBypassToken();
+  if (bypass) out["x-bypass-token"] = bypass;
+  const byok = loadByokKey();
+  if (byok) out["x-user-api-key"] = byok;
+  const unlock = getUnlockToken();
+  if (unlock) out["x-unlock-token"] = unlock;
+  return out;
+}
+
 export async function callApi<TBody, TResp>({
   endpoint,
   body,
@@ -45,6 +60,8 @@ export async function callApi<TBody, TResp>({
   if (bypass) headers["x-bypass-token"] = bypass;
   const byok = loadByokKey();
   if (byok) headers["x-user-api-key"] = byok;
+  const unlock = getUnlockToken();
+  if (unlock) headers["x-unlock-token"] = unlock;
 
   const res = await fetch(urlFor(endpoint), {
     method: "POST",

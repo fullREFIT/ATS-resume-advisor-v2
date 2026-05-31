@@ -13,6 +13,7 @@ import { ResumeDiff } from "@/components/ResumeDiff";
 import { ApplicationPackage } from "@/components/ApplicationPackage";
 import { clearSession, loadSession, saveSession } from "@/lib/storage";
 import { TargetPersonsPanel } from "@/components/TargetPersonsPanel";
+import { authHeaders } from "@/lib/api-fetch";
 import type {
   CompanyTailoredOutput,
   IntakeMode,
@@ -96,7 +97,7 @@ export function ResultPageClient() {
 
     const res = await fetch("/api/demo/target-persons", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", ...authHeaders() },
       body: JSON.stringify({
         resume: s.resume,
         companyContent: s.companyContent.text,

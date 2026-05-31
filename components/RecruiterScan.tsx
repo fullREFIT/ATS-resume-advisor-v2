@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { loadSession, patchSession } from "@/lib/storage";
 import type { RecruiterScan } from "@/lib/types";
+import { authHeaders } from "@/lib/api-fetch";
 
 type ScanVerdict = "ADVANCE" | "REJECT" | "MAYBE";
 
@@ -54,7 +55,7 @@ export function RecruiterScanSection({ resumeText }: { resumeText: string }) {
     try {
       const res = await fetch("/api/demo/recruiter-scan", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify({ resumeText }),
       });
       const data = (await res.json()) as { scan?: RecruiterScan; error?: string };

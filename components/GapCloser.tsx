@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Diagnosis, GapCloserAction, GapCloserPlan, Verdict } from "@/lib/types";
+import { authHeaders } from "@/lib/api-fetch";
 
 const VERDICT_STYLE: Record<"GO" | "FIX_FIRST", { background: string; color: string; label: string }> = {
   GO: { background: "#14532d", color: "#4ade80", label: "GO" },
@@ -83,7 +84,7 @@ export function GapCloser({ verdict, resume, jd, diagnosis }: Props) {
       try {
         const res = await fetch("/api/demo/gap-closer", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...authHeaders() },
           body: JSON.stringify({ resume, jd, diagnosis }),
         });
         const data = (await res.json()) as { plan?: GapCloserPlan; error?: string };

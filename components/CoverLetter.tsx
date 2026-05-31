@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { CopyButton } from "@/components/CopyButton";
 import { loadSession, patchSession } from "@/lib/storage";
 import type { CoverLetterOutput } from "@/lib/types";
+import { authHeaders } from "@/lib/api-fetch";
 
 interface RoleProps {
   mode: "role";
@@ -116,7 +117,7 @@ export function CoverLetterSection(props: Props) {
 
       const res = await fetch("/api/demo/cover-letter", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...authHeaders() },
         body: JSON.stringify(body),
       });
       const data = (await res.json()) as {

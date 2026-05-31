@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, DM_Sans, DM_Mono } from "next/font/google";
 import { BugReporter } from "@/components/BugReporter";
 import { BypassCapture } from "@/components/BypassCapture";
+import { UnlockClaimer } from "@/components/UnlockClaimer";
 import "./globals.css";
 
 const serif = Instrument_Serif({
@@ -49,6 +50,7 @@ export default function RootLayout({
     >
       <body className="min-h-screen flex flex-col bg-[#0a0a0a] text-[#e8e4de]">
         <BypassCapture />
+        <UnlockClaimer />
         {children}
         <BugReporter />
       </body>

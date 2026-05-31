@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { callClaude, classifyError, parseJson, getProviderApiKey } from "@/lib/claude";
 import { RECRUITER_SCAN_SYSTEM } from "@/lib/prompts";
-import { consumeQuota, consumeQuotaUnlessByok, consumeBudget, consumeBudgetUnlessByok, estimateRequestCost, budgetExhaustedMessage } from "@/lib/ratelimit";
+import { consumeQuota, consumeBudget, estimateRequestCost, budgetExhaustedMessage, consumeQuotaUnless, consumeBudgetUnless, consumeUnlockToken } from "@/lib/ratelimit";
 import type { RecruiterScan } from "@/lib/types";
 import { extractByokKey } from "@/lib/byok-helpers";
 
@@ -11,7 +11,9 @@ export const maxDuration = 30;
 
 export async function POST(req: Request) {
   const byokKey = extractByokKey(req);
-  const quota = await consumeQuotaUnlessByok(req, byokKey);
+  const unlock = await consumeUnlockToken(req);
+  const skipMetering = !!byokKey || unlock.valid;
+  const quota = await consumeQuotaUnless(req, skipMetering);
   if (!quota.allowed) {
     return NextResponse.json(
       { error: "Daily limit reached. Try again tomorrow." },
@@ -19,7 +21,7 @@ export async function POST(req: Request) {
     );
   }
 
-  const budget = await consumeBudgetUnlessByok(byokKey, estimateRequestCost("fabrication_guard"));
+  const budget = await consumeBudgetUnless(skipMetering, estimateRequestCost("fabrication_guard"));
   if (!budget.allowed) {
     return NextResponse.json(
       { error: budgetExhaustedMessage(), budget },
