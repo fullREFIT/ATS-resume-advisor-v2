@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { submitToSupportBot } from "@/lib/support-bot/client";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -28,35 +29,43 @@ export async function POST(req: Request) {
     // No webhook configured — log and succeed silently so the user
     // doesn't see an error even in dev without Slack set up.
     console.warn("[feedback] SLACK_WEBHOOK_URL not set — bug report not forwarded:", description);
-    return NextResponse.json({ ok: true });
-  }
-
-  const now = new Date().toLocaleString("en-US", {
-    timeZone: "America/New_York",
-    dateStyle: "medium",
-    timeStyle: "short",
-  });
-
-  const text = [
-    `🐛 *Bug Report — Resume Verdict*`,
-    `*Time:* ${now}`,
-    `*Page:* ${body.page ?? "unknown"}`,
-    `*Browser:* ${body.browserInfo ?? "unknown"} · ${body.viewport ?? "unknown"}`,
-    ``,
-    `*Description:*`,
-    `> ${description.replace(/\n/g, "\n> ")}`,
-  ].join("\n");
-
-  try {
-    await fetch(webhookUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text }),
+  } else {
+    const now = new Date().toLocaleString("en-US", {
+      timeZone: "America/New_York",
+      dateStyle: "medium",
+      timeStyle: "short",
     });
-  } catch (err) {
-    console.error("[feedback] Slack webhook failed:", err);
-    // Still return success — user reported it, that's what matters.
+
+    const text = [
+      `🐛 *Bug Report — Resume Verdict*`,
+      `*Time:* ${now}`,
+      `*Page:* ${body.page ?? "unknown"}`,
+      `*Browser:* ${body.browserInfo ?? "unknown"} · ${body.viewport ?? "unknown"}`,
+      ``,
+      `*Description:*`,
+      `> ${description.replace(/\n/g, "\n> ")}`,
+    ].join("\n");
+
+    try {
+      await fetch(webhookUrl, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+    } catch (err) {
+      console.error("[feedback] Slack webhook failed:", err);
+      // Still return success — user reported it, that's what matters.
+    }
   }
+
+  // Fire-and-forget dual-write to the cross-app support bot. Never block.
+  void submitToSupportBot({
+    transcript: description,
+    route: body.page,
+    user_agent: body.browserInfo,
+    viewport: body.viewport,
+    kind: "bug",
+  });
 
   return NextResponse.json({ ok: true });
 }
